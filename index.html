@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>3BLD Pair Trainer</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0B0E14;--panel:#121722;--line:#222B3B;--fg:#D3D8E0;--muted:#8D96A8;--acc:#67E8F9;--on:#07202A;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--fg);font-family:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;overflow:hidden}
+body{user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+button,select,input,textarea{font:inherit;color:inherit}
+button{background:none;border:1px solid var(--line);border-radius:6px;padding:.4em .8em;cursor:pointer}
+button:hover{border-color:var(--acc)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+#top{z-index:2;position:fixed;top:env(safe-area-inset-top,0px);right:0;display:flex;gap:.5rem;padding:.8rem}
+#top button{border:0;font-size:1.25rem;color:var(--muted);padding:.3em .5em}
+#top button:hover{color:var(--acc)}
+#main{position:relative;z-index:1;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:1.2rem;padding:1rem}
+#pair{--n:1;display:flex;justify-content:center;gap:var(--gap,1.75rem);font-size:clamp(2rem,calc((92vw - (var(--n) - 1) * var(--gap,1.75rem)) / (var(--n) * 1.6)),11rem);font-weight:600;letter-spacing:.15em;white-space:pre;padding:.25em .5em;border-radius:14px;min-height:1.4em;line-height:1.2;transition:opacity .15s,text-shadow .15s ease-out,box-shadow .15s ease-out}
+#pair.idle{font-size:clamp(1.1rem,4vw,1.6rem);font-weight:400;color:var(--muted);letter-spacing:.05em;white-space:normal}
+#pair.run{text-shadow:0 0 .35em color-mix(in srgb,var(--acc) 55%,transparent),0 0 1em color-mix(in srgb,var(--acc) 30%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--acc) 35%,transparent),0 0 40px color-mix(in srgb,var(--acc) 18%,transparent)}
+#pair.hid{opacity:0}
+#pair.pulse{animation:none}
+#pair.run{transition:none}
+#pair span{margin-right:-.15em}
+.danger{border-color:#DC2626;color:#DC2626}
+.danger.solid{background:#DC2626;color:#fff;border-color:#DC2626;font-weight:600}
+@keyframes pl{from{opacity:.25;transform:scale(.94) translateY(5px)}to{opacity:1;transform:none}}
+#time{font-size:clamp(1.2rem,4vw,1.8rem);color:var(--muted);min-height:1.5em;letter-spacing:.05em}
+#time.done{color:var(--acc)}
+#word{color:var(--fg);font-size:clamp(1.1rem,3.6vw,1.8rem);min-height:1.5em;letter-spacing:.08em}
+#time.r0{color:#4ADE80}#time.r1{color:#FBBF24}#time.r2{color:#F87171}
+#pace{width:min(420px,60vw);height:3px;background:var(--line);border-radius:2px;overflow:hidden;visibility:hidden}
+#pace i{display:block;height:100%;background:var(--acc);transform-origin:left;transform:scaleX(0)}
+#pace.over i{background:#FBBF24}
+#wrap{min-height:2.6rem}
+#wi{display:none;width:min(440px,86vw);background:var(--panel);border:1px solid var(--acc);border-radius:6px;padding:.6em .8em;text-align:center;user-select:text;-webkit-user-select:text}
+#guide{position:fixed;bottom:0;left:0;right:0;text-align:center;padding:.8rem calc(.8rem) calc(.8rem + env(safe-area-inset-bottom,0px));font-size:.75rem;color:var(--muted);transition:opacity 1s;pointer-events:none}
+body.live #guide{opacity:.2}
+.ov{position:fixed;inset:0;background:rgba(5,7,11,.7);display:none;z-index:5;align-items:center;justify-content:center;padding:1rem}
+.ov.on{display:flex}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:12px;width:min(640px,100%);max-height:88vh;overflow:auto;padding:1.2rem}
+.box h2{margin:0 0 .8rem;font-size:1.1rem;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.box h3{margin:1.2rem 0 .5rem;font-size:.9rem;color:var(--acc);font-weight:600}
+.row{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;margin:.4rem 0}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chips button{width:2rem;height:2rem;padding:0;font-size:.8rem}
+.chips button.on{background:var(--acc);color:var(--on);border-color:var(--acc);font-weight:600}
+label{display:flex;gap:.5rem;align-items:center;font-size:.9rem;cursor:pointer}
+input[type=number],select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:.3em .5em}
+input[type=number]{width:5em}
+textarea{width:100%;height:7rem;font-size:.75rem;user-select:text;-webkit-user-select:text}
+.sw{width:1.8rem;height:1.8rem;border-radius:50%;padding:0;border:2px solid transparent}
+.sw.on{border-color:var(--fg)}
+#drawer{justify-content:flex-end;padding:0}
+#drawer .box{height:100%;max-height:100%;width:min(380px,100%);border-radius:0;border-width:0 0 0 1px}
+.stat{display:flex;justify-content:space-between;padding:.3rem 0;border-bottom:1px solid var(--line);font-size:.9rem}
+.mut{color:var(--muted);font-size:.8rem}
+#hm{display:grid;grid-template-columns:repeat(25,1fr);gap:1px;width:100%;margin:0 auto}
+#hm div{aspect-ratio:1;font-size:max(7px,1.6vw);display:flex;align-items:center;justify-content:center;color:var(--muted);border-radius:2px}
+#toast{position:fixed;bottom:3rem;left:50%;transform:translateX(-50%);background:var(--panel);border:1px solid var(--line);padding:.5em 1em;border-radius:6px;font-size:.85rem;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
+#toast.on{opacity:1}
+.ov.out{display:flex;animation:fo .12s ease-in forwards;pointer-events:none}
+.ov.on{animation:fi .12s ease-out}
+.ov.on .box{animation:mi .15s ease-out}
+.ov.out .box{animation:mo .12s ease-in forwards}
+#drawer.on .box{animation:ds .15s ease-out}
+#drawer.out .box{animation:dso .12s ease-in forwards}
+@keyframes fi{from{opacity:0}}
+@keyframes fo{to{opacity:0}}
+@keyframes mi{from{opacity:0;transform:translateY(10px) scale(.98)}}
+@keyframes mo{to{opacity:0;transform:translateY(6px) scale(.98)}}
+@keyframes ds{from{transform:translateX(40px);opacity:0}}
+@keyframes dso{to{transform:translateX(40px);opacity:0}}
+#word.pop{animation:wp .15s ease-out}
+@keyframes wp{from{opacity:0;transform:translateY(-6px)}}
+html[data-bg=oled]{--bg:#000;--panel:#0A0A0A;--line:#1F1F1F}
+:root{--g:#4ADE80;--y:#FBBF24;--r:#F87171}
+html[data-lt="1"]{color-scheme:light;--fg:#1C1B1A;--muted:#6B6560;--g:#15803D;--y:#B45309;--r:#B91C1C}
+html[data-bg=aurora]{--bg:#07080F;--panel:#0F1220;--line:#1E2340;--acc:#B79CFF;--on:#140A33;--b1:#4C2A9E;--b2:#12307A;--b3:#2E1A66;--bo:.55}
+html[data-bg=forest]{--bg:#06140E;--panel:#0C2018;--line:#1A3B2D;--fg:#E3F1E8;--muted:#8FB3A0;--acc:#5EEAA6;--on:#052416;--b1:#14532D;--b2:#0F766E;--b3:#365314;--bo:.55}
+html[data-bg=ocean]{--bg:#061219;--panel:#0B1F2B;--line:#173547;--fg:#DDEBF2;--muted:#86A8BA;--acc:#4FD1E8;--on:#04222B;--b1:#0E7490;--b2:#1E3A8A;--b3:#115E59;--bo:.5}
+html[data-bg=ember]{--bg:#140A07;--panel:#201210;--line:#3A2019;--fg:#F3E3DC;--muted:#B39588;--acc:#FF9F6B;--on:#2B1105;--b1:#9A3412;--b2:#7F1D1D;--b3:#78350F;--bo:.5}
+html[data-bg=rose]{--bg:#130A12;--panel:#1F1220;--line:#3A2140;--fg:#F2E3F0;--muted:#B392B0;--acc:#F9A8D4;--on:#2A0B20;--b1:#9D174D;--b2:#6B21A8;--b3:#831843;--bo:.5}
+html[data-bg=sunset]{--bg:#FFF1E2;--panel:#FFFAF4;--line:#EFD6BF;--fg:#2A1810;--muted:#7A5F4F;--acc:#C2410C;--on:#fff;--g:#166534;--y:#92400E;--r:#B91C1C;--b1:#F58A5B;--b2:#FFC9A3;--b3:#FFDDB8;--bo:.6}
+html[data-bg=sage]{--bg:#F1EEDC;--panel:#FBF9EE;--line:#D5D2B6;--fg:#14231A;--muted:#566A5C;--acc:#166534;--on:#fff;--g:#14532D;--y:#854D0E;--r:#991B1B;--b1:#A9C49A;--b2:#86AE92;--b3:#E8DDBD;--bo:.45}
+html[data-bg=meadow]{--bg:#F6FBEA;--panel:#FFFFFF;--line:#DCE8C4;--fg:#18230F;--muted:#5C6B49;--acc:#4D7C0F;--on:#fff;--g:#3F6212;--y:#854D0E;--r:#B91C1C;--b1:#BEF264;--b2:#86EFAC;--b3:#FDE68A;--bo:.5}
+html[data-bg=lagoon]{--bg:#EEF9FA;--panel:#FFFFFF;--line:#CBE6EA;--fg:#0E2A33;--muted:#4F6F7A;--acc:#0E7490;--on:#fff;--g:#0F766E;--y:#92400E;--r:#B91C1C;--b1:#7DD3FC;--b2:#5EEAD4;--b3:#BAE6FD;--bo:.5}
+html[data-bg=lavender]{--bg:#F6F1FC;--panel:#FFFFFF;--line:#E2D6F3;--fg:#241838;--muted:#6B5A86;--acc:#6D28D9;--on:#fff;--g:#166534;--y:#92400E;--r:#BE123C;--b1:#C4B5FD;--b2:#F9A8D4;--b3:#DDD6FE;--bo:.5}
+html[data-bg=light]{--bg:#FAFAF8;--panel:#FFFFFF;--line:#E3E3DE;--acc:#0E7490;--on:#fff}
+[style*="#4ADE80"]{color:var(--g)!important}[style*="#FBBF24"]{color:var(--y)!important}[style*="#F87171"]{color:var(--r)!important}
+#time.r0{color:var(--g)}#time.r1{color:var(--y)}#time.r2{color:var(--r)}
+html[data-lt="1"] #pair.run{text-shadow:0 0 .3em color-mix(in srgb,var(--acc) 30%,transparent)}
+#time{font-weight:600}
+#word{text-transform:lowercase}
+.btnlike{display:inline-block;border:1px solid var(--line);border-radius:6px;padding:.4em .8em;cursor:pointer;transition:border-color .18s}
+.btnlike:hover{border-color:var(--acc)}
+.pk2{color:var(--acc);font-weight:600}
+
+button{transition:border-color .18s,background-color .18s,transform .12s}
+button:active{transform:scale(.97)}
+.ov{background:rgba(4,6,10,.42)}
+html[data-lt="1"] .ov{background:rgba(40,30,20,.22)}
+.box{background:color-mix(in srgb,var(--panel) 94%,transparent);border-radius:20px;box-shadow:0 30px 90px -20px rgba(0,0,0,.55),0 2px 0 0 rgba(255,255,255,.03) inset;-webkit-backdrop-filter:blur(24px) saturate(1.4);backdrop-filter:blur(24px) saturate(1.4)}
+#drawer .box{border-radius:20px 0 0 20px}
+.ov.on{animation:ovi .34s cubic-bezier(.32,.72,0,1) forwards}
+.ov.out{animation:ovo .22s cubic-bezier(.4,0,1,1) forwards}
+.ov.on .box{animation:bxi .45s cubic-bezier(.32,.72,0,1) both}
+.ov.out .box{animation:bxo .22s cubic-bezier(.4,0,1,1) forwards}
+#drawer.on .box{animation:dwi .45s cubic-bezier(.32,.72,0,1) both}
+#drawer.out .box{animation:dwo .24s cubic-bezier(.4,0,1,1) forwards}
+@keyframes ovi{from{opacity:0;-webkit-backdrop-filter:blur(0);backdrop-filter:blur(0)}to{opacity:1;-webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3)}}
+@keyframes ovo{from{opacity:1;-webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3)}to{opacity:0;-webkit-backdrop-filter:blur(0);backdrop-filter:blur(0)}}
+@keyframes bxi{from{opacity:0;transform:translateY(20px) scale(.94)}to{opacity:1;transform:none}}
+@keyframes bxo{to{opacity:0;transform:translateY(10px) scale(.97)}}
+@keyframes dwi{from{opacity:0;transform:translateX(56px)}to{opacity:1;transform:none}}
+@keyframes dwo{to{opacity:0;transform:translateX(40px)}}
+#bgfx{position:fixed;inset:0;z-index:0;pointer-events:none;display:none;overflow:hidden}
+html[data-anim="1"] #bgfx{display:block}
+#bgfx i{position:absolute;width:75vmax;height:75vmax;border-radius:50%;filter:blur(80px);opacity:var(--bo,.5)}
+#bgfx i:nth-child(1){background:var(--b1);left:-25vmax;top:-30vmax;animation:w1 38s ease-in-out infinite alternate}
+#bgfx i:nth-child(2){background:var(--b2);right:-30vmax;bottom:-30vmax;animation:w2 46s ease-in-out infinite alternate}
+#bgfx i:nth-child(3){background:var(--b3);left:20vw;top:25vh;width:55vmax;height:55vmax;animation:w3 54s ease-in-out infinite alternate}
+@keyframes w1{to{transform:translate(40vmax,30vmax) scale(1.15)}}
+@keyframes w2{to{transform:translate(-35vmax,-25vmax) scale(1.2)}}
+@keyframes w3{to{transform:translate(25vmax,-20vmax) scale(.85)}}
+pre{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:.6em;font-size:.8rem;overflow:auto;user-select:text;-webkit-user-select:text;margin:.4rem 0}
+.box p,.box li{font-size:.88rem;line-height:1.5}
+.box ul{padding-left:1.1rem;margin:.3rem 0}
+kbd{border:1px solid var(--line);border-radius:4px;padding:0 .35em;color:var(--acc);font:inherit}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}#bgfx i{animation:none!important}}
+
+input,textarea{user-select:text;-webkit-user-select:text}
+#sclk{position:fixed;top:env(safe-area-inset-top,0px);left:0;padding:1rem .95rem;color:var(--muted);font-size:.85rem;letter-spacing:.06em;font-variant-numeric:tabular-nums;opacity:.85;z-index:2;pointer-events:none}
+#settings .box{width:min(620px,100%);padding:1.8rem 1.5rem 2.4rem}
+#settings .box h2{font-size:1.7rem;font-weight:700;margin:0 0 .2rem;letter-spacing:-.01em}
+.sec{font-size:1.2rem;font-weight:700;margin:2.2rem .25rem .75rem}
+.grp{background:color-mix(in srgb,var(--bg) 50%,var(--panel));border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:.9rem}
+.it{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.95rem 1.1rem;border-top:1px solid var(--line);min-height:3.4rem;font-size:.95rem}
+.grp>:first-child{border-top:0}
+.pad{padding:1.1rem;border-top:1px solid var(--line)}
+.lb{display:flex;align-items:center;flex:1;min-width:0}
+.ctl{display:flex;align-items:center;gap:.6rem}
+.fn{color:var(--muted);font-size:.8rem;line-height:1.5;margin:.1rem .4rem .6rem}
+.grp select{max-width:60%}
+.grp textarea{width:100%;height:6rem;margin:.6rem 0}
+.btns{display:flex;flex-direction:column;gap:.6rem;padding:1.1rem}
+.btns button{width:100%;padding:.75em}
+.tg{appearance:none;-webkit-appearance:none;flex:none;width:46px;height:28px;border-radius:14px;background:var(--line);position:relative;cursor:pointer;transition:background-color .25s;margin:0}
+.tg::after{content:"";position:absolute;top:2px;left:2px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.35);transition:transform .3s cubic-bezier(.32,.72,0,1)}
+.tg:checked{background:var(--acc)}
+.tg:checked::after{transform:translateX(18px)}
+.inf{display:inline-flex;align-items:center;justify-content:center;flex:none;width:1.15rem;height:1.15rem;border-radius:50%;border:1px solid var(--muted);color:var(--muted);font-size:.7rem;font-style:normal;margin-left:.5rem;cursor:help}
+.inf:hover,.inf:focus-visible{color:var(--acc);border-color:var(--acc)}
+#tip{position:fixed;z-index:30;left:0;top:0;width:max-content;max-width:min(270px,80vw);background:var(--fg);color:var(--bg);padding:.55em .85em;border-radius:10px;font-size:.78rem;line-height:1.45;box-shadow:0 12px 40px -8px rgba(0,0,0,.5);opacity:0;visibility:hidden;transform:translateY(4px);transition:opacity .15s,transform .15s,visibility .15s;pointer-events:none}
+#tip.on{opacity:1;visibility:visible;transform:none}
+#heat .box{width:fit-content;max-width:100%;max-height:none;overflow:visible;padding:1rem 1.1rem}
+#heat .box h2{margin-bottom:.6rem}
+#hm{width:min(calc(100vw - 4.5rem),calc(100vh - 12.5rem),860px);width:min(calc(100vw - 4.5rem),calc(100dvh - 12.5rem),860px)}
+#hm div{font-size:clamp(7px,1.5vmin,13px)}
+#heat .mut{max-width:min(calc(100vw - 4.5rem),860px)}
+.lr{display:grid;grid-template-columns:2rem 3.2rem 1fr auto;gap:.5rem;align-items:center;padding:.6rem 0;border-bottom:1px solid var(--line)}
+.lr.hd{color:var(--muted);font-size:.75rem;padding:.3rem 0}
+.rk{color:var(--muted)}
+.lp{font-weight:700;letter-spacing:.1em;font-size:1.05rem}
+.lwd{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-transform:lowercase}
+.lt{font-weight:600;font-variant-numeric:tabular-nums}
+.fld{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:.7em .9em;font-size:1.1rem;margin:.4rem 0}
+#lq{text-transform:uppercase;letter-spacing:.25em;text-align:center;font-size:1.6rem;font-weight:600}
+</style>
+</head>
+<body>
+<div id="bgfx"><i></i><i></i><i></i></div>
+<div id="sclk">0:00</div>
+<div id="top">
+<button id="bd" tabindex="-1" aria-label="Word lookup" title="Word lookup [D]">Aa</button>
+<button id="bh" tabindex="-1" aria-label="Heatmap" title="Heatmap">▦</button>
+<button id="bs" tabindex="-1" aria-label="Session stats" title="Session stats">≡</button>
+<button id="bg" tabindex="-1" aria-label="Settings" title="Settings">⚙</button>
+</div>
+<div id="main">
+<div id="pace"><i></i></div>
+<div id="pair" class="idle">Press Spacebar to Start</div>
+<div id="time"></div>
+<div id="word"></div>
+<div id="wrap"><input id="wi" type="text" autocomplete="off" spellcheck="false"></div>
+</div>
+<div id="guide">[Space] Next &nbsp;|&nbsp; [Esc] Reset &nbsp;|&nbsp; [Tab] Word &nbsp;|&nbsp; [D] Lookup</div>
+<div id="toast"></div>
+<div id="tip"></div>
+
+<div class="ov" id="settings"><div class="box" role="dialog" aria-label="Settings">
+<h2>Settings <button data-close>Close</button></h2>
+
+<div class="sec">Practice &amp; Randomization</div>
+<div class="grp">
+<div class="it"><span class="lb">Randomization mode<i class="inf" tabindex="0" data-tip="How the next pair is chosen. 3BLD IRL is true random with no immediate repeats. (See Tutorial for full details)">i</i></span>
+<select data-k="rm"><option value="irl">3BLD IRL (True Random)</option><option value="full">Full Pool Non-Repeating</option><option value="hybrid">Weak-Pair Hybrid Split (60/40 Split)</option><option value="drill">Strict Weak-Pairs Drill Only</option></select></div>
+<div class="it"><span class="lb">Pairs per attempt</span><select data-k="n"><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+<div class="it"><span class="lb">Spacing between pairs</span><span class="ctl"><input type="number" min="0.5" max="4" step="0.25" data-k="gap"><span class="mut">rem</span></span></div>
+<label class="it"><span class="lb">Exclude identical pairs<i class="inf" tabindex="0" data-tip="Skips AA, BB, CC and the other doubled pairs.">i</i></span><input type="checkbox" class="tg" data-k="noId"></label>
+</div>
+<div class="grp">
+<div class="pad"><div class="lb" style="margin-bottom:.6rem"><b>Letter pool</b><i class="inf" tabindex="0" data-tip="A pair is used only when its first letter and its second letter are both selected.">i</i></div>
+<div class="mut">First letter</div><div class="chips" id="cf"></div>
+<div class="mut" style="margin-top:.8rem">Second letter</div><div class="chips" id="cs"></div>
+<div class="row" style="margin-top:.9rem">
+<button id="pall">Select all</button><button id="pclr">Clear all</button>
+<select id="pl"></select>
+<button id="ps">All <b class="pk">A</b>_ pairs</button><button id="pe">All _<b class="pk">A</b> pairs</button>
+</div></div>
+</div>
+
+<div class="sec">Timer &amp; Pacing</div>
+<div class="grp">
+<label class="it"><span class="lb">Flash mode<i class="inf" tabindex="0" data-tip="Shows the pair briefly, then hides it while the timer keeps running. (See Tutorial for full details)">i</i></span><input type="checkbox" class="tg" data-k="flash"></label>
+<div class="it"><span class="lb">Flash duration</span><span class="ctl"><input type="range" min="0.1" max="1" step="0.05" data-k="fd"><span id="fdv" class="mut"></span></span></div>
+<label class="it"><span class="lb">Hide timer while running<i class="inf" tabindex="0" data-tip="Keeps timing in the background and shows only the final time when you stop.">i</i></span><input type="checkbox" class="tg" data-k="hideT"></label>
+<label class="it"><span class="lb">Zen mode<i class="inf" tabindex="0" data-tip="Hides times, stats and the session clock for pure recognition practice.">i</i></span><input type="checkbox" class="tg" data-k="zen"></label>
+<label class="it"><span class="lb">Target pace bar<i class="inf" tabindex="0" data-tip="Shows a thin progress bar toward your goal time while the timer runs.">i</i></span><input type="checkbox" class="tg" data-k="pace"></label>
+<div class="it"><span class="lb">Goal time</span><span class="ctl"><input type="number" min="0.2" max="20" step="0.1" data-k="goal"><span class="mut">s</span></span></div>
+</div>
+
+<div class="sec">Speed Ratings &amp; Weak Pairs</div>
+<div class="grp">
+<div class="it"><span class="lb"><span style="color:#4ADE80">Fast (green) under</span><i class="inf" tabindex="0" data-tip="Fast and Medium cut-offs colour your times and the heatmap. Anything slower than Medium is Slow. (See Tutorial for full details)">i</i></span><span class="ctl"><input type="number" min="0.1" max="20" step="0.1" data-k="tf"><span class="mut">s</span></span></div>
+<div class="it"><span class="lb"><span style="color:#FBBF24">Medium (yellow) up to</span></span><span class="ctl"><input type="number" min="0.1" max="20" step="0.1" data-k="tm"><span class="mut">s</span></span></div>
+<div class="it"><span class="lb">Weak-pair threshold<i class="inf" tabindex="0" data-tip="Single pairs slower than this are flagged as weak. In Hybrid or Drill mode, finishing a flagged pair under it 3 times in a row graduates it. (See Tutorial for full details)">i</i></span><span class="ctl"><input type="number" min="0.2" max="20" step="0.1" data-k="thr"><span class="mut">s</span></span></div>
+</div>
+<div class="fn">Multi-pair attempts are never rated or added to the heatmap.</div>
+
+<div class="sec">Sound</div>
+<div class="grp">
+<label class="it"><span class="lb">Sound Effects<i class="inf" tabindex="0" data-tip="Soft synthesized clicks, a completion pulse and a graduation flourish. Nothing is downloaded.">i</i></span><input type="checkbox" class="tg" data-k="snd"></label>
+<div class="it"><span class="lb">Master volume</span><span class="ctl"><input type="range" min="0" max="1" step="0.01" data-k="vol"><span id="vlv" class="mut"></span></span></div>
+</div>
+
+<div class="sec">Visuals &amp; Themes</div>
+<div class="grp">
+<div class="it"><span class="lb">Theme</span><select data-k="bg"><optgroup label="Dark"><option value="oled">OLED pure black</option><option value="solid">Solid dark navy</option><option value="aurora">Dark aurora</option><option value="forest">Deep forest</option><option value="ocean">Midnight ocean</option><option value="ember">Dark ember</option><option value="rose">Midnight rose</option></optgroup><optgroup label="Light"><option value="sunset">Warm sunset</option><option value="sage">Nature and sage</option><option value="meadow">Spring meadow</option><option value="lagoon">Coastal lagoon</option><option value="lavender">Lavender field</option><option value="light">Modern light minimal</option></optgroup></select></div>
+</div>
+<div class="fn">Accent colours follow the theme. All themes except OLED, Solid navy and Modern light have a slow animated background.</div>
+
+<div class="sec">Data Management</div>
+<div class="grp">
+<div class="pad"><div class="lb"><b>Backup &amp; import</b></div>
+<div class="fn" style="margin-left:0">Export fills the box with JSON or a pair,word CSV. Paste JSON, CSV or a Speffz grid and press Import, or choose a file.</div>
+<label><input type="file" id="bfile" accept=".csv,.tsv,.txt,.json,text/csv" style="display:none"><span class="btnlike">Choose CSV or JSON file</span></label>
+<textarea id="dj" spellcheck="false"></textarea>
+<div class="row"><button id="bex">Export JSON</button><button id="bcsv">Export words CSV</button><button id="bcp">Copy</button><button id="bim">Import</button></div></div>
+<div class="it"><span class="lb">Guides, formats and shortcuts</span><button id="bhelp">Tutorial &amp; Help</button></div>
+</div>
+<div class="sec">Reset</div>
+<div class="grp"><div class="btns">
+<button class="danger" id="bc1">Clear Session History &amp; Heatmap Stats</button>
+<button class="danger" id="bc2">Clear Mnemonic Word Dictionary</button>
+<button class="danger solid" id="bc3">Factory Reset (Clear All Data)</button>
+</div></div>
+</div></div>
+
+<div class="ov" id="heat"><div class="box" role="dialog" aria-label="Heatmap">
+<h2>Recall heatmap <button data-close>Close</button></h2>
+<div id="hm"></div>
+<div class="mut" id="hmi" style="margin-top:.6rem;min-height:1.3em">Hover or tap a cell for details.</div>
+<div class="mut"><span id="hl"></span> Dark cells are untested. Multi-pair attempts are not counted.</div>
+</div></div>
+
+<div class="ov" id="help"><div class="box" role="dialog" aria-label="Tutorial and help">
+<h2>Tutorial &amp; Help <button data-close>Close</button></h2>
+<h3>Importing word lists from Google Sheets or Excel</h3>
+<p>In Google Sheets or Excel, put the pair in column A and the word in column B. Select the cells and copy them, then paste into the Backup box in Settings and press Import. You can also download the sheet as a CSV (File, Download, Comma Separated Values), open it in a text editor, and paste that.</p>
+<pre>pair,word
+BX,Box
+HR,Hair
+LQ,Liquid</pre>
+<p>Tab-separated pastes straight from a sheet also work, and the header row is optional. Pairs use letters A to X. Importing adds to your existing words and overwrites any matching pairs.</p>
+<p>Speffz grid spreadsheets work too. Put the first letters (A to X) down the first column and the second letters across the top row, with the word in each crossing cell. Row G and column N gives the pair GN. Labels like words or X / SH are cleaned up automatically (X / SH counts as X), and empty cells are skipped. Every imported word is converted to lowercase.</p>
+<pre>,A,B,C
+A,aqua,abbey,acorn
+B,bat,bubble,
+C,cat,cabin,cucumber</pre>
+<p>JSON is accepted too:</p>
+<pre>{"words":{"BX":"Box","HR":"Hair"}}</pre>
+<h3>Where words appear</h3>
+<p>Saved words automatically appear directly below the timer and pair as soon as you stop the timer. In batch mode, each pair’s word shows in order.</p>
+<h3>Keyboard shortcuts</h3>
+<ul><li><kbd>[Space]</kbd> Cycle/Stop: start, stop, then load the next pair</li><li><kbd>[Esc]</kbd> or <kbd>[R]</kbd> Reset: cancel the run without saving a time</li><li><kbd>[Tab]</kbd> Edit Word after stopping, then <kbd>[Enter]</kbd> to save</li><li><kbd>[D]</kbd> Lookup: find or edit any pair&rsquo;s word</li></ul>
+<h3>Randomization modes</h3>
+<ul><li><b>3BLD IRL (True Random)</b>: every draw is random from your active pool, with no forced cycling. The same pair never appears twice in a row.</li><li><b>Full Pool Non-Repeating</b>: shuffles the whole pool and deals every pair once before any repeats.</li><li><b>Weak-Pair Hybrid Split (60/40)</b>: about 40% of draws come from your weak pairs and 60% from the full pool.</li><li><b>Strict Weak-Pairs Drill Only</b>: only weak pairs. With none flagged yet, it uses your slowest tested pairs, or untested pairs on a fresh start.</li></ul>
+<h3>Weak pairs and graduation</h3>
+<p>A single pair slower than the weak-pair threshold is flagged. In Hybrid or Drill mode, finishing a flagged pair under the threshold 3 times in a row graduates it: it is removed from the weak list and the stats count.</p>
+<h3>Lookup and leaderboard</h3>
+<p>Press <kbd>[D]</kbd> or the Aa button to look up or edit any pair&rsquo;s word. The stats drawer shows your 10 slowest single pairs from the last 48 hours, with their words. The clock at the top left is your session time.</p>
+<h3>Multi-pair attempts</h3>
+<p>When Pairs per attempt is 2 or more, the final time keeps your accent colour and the attempt is left out of the heatmap and the fast/medium/slow counts, since those thresholds are for single pairs.</p>
+</div></div>
+
+<div class="ov" id="confirm"><div class="box" role="dialog" aria-label="Confirm clear" style="width:min(420px,100%)">
+<h2 id="ct">Clear everything?</h2>
+<p id="cp"></p>
+<div class="row"><button id="cno">Cancel</button><button id="cyes" style="border-color:#F87171;color:#F87171">Yes, clear all data</button></div>
+</div></div>
+
+<div class="ov" id="imp"><div class="box" role="dialog" aria-label="Import result" style="width:min(420px,100%)">
+<h2 id="impt">Import complete</h2>
+<p id="impm"></p>
+<div id="impp" class="mut"></div>
+<div class="row" style="margin-top:1rem"><button data-close>Done</button></div>
+</div></div>
+
+<div class="ov" id="lookup"><div class="box" role="dialog" aria-label="Word lookup" style="width:min(440px,100%)">
+<h2>Word lookup <button data-close>Close</button></h2>
+<input id="lq" class="fld" maxlength="2" placeholder="BX" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Letter pair">
+<input id="lw" class="fld" type="text" placeholder="mnemonic word" autocomplete="off" spellcheck="false" aria-label="Mnemonic word">
+<div class="mut" id="ls"></div>
+<div class="row" style="margin-top:.8rem"><button id="lsave">Save word</button><button id="ldel">Remove word</button></div>
+</div></div>
+
+<div class="ov" id="drawer"><div class="box" role="dialog" aria-label="Session stats">
+<h2>Session <button data-close>Close</button></h2>
+<div id="sb"></div>
+</div></div>
+
+<script>
+(function(){
+const L='ABCDEFGHIJKLMNOPQRSTUVWX'.split(''),ALL=L.join('');
+const KEY='bld-pairs-v1';
+const DEF={F:ALL,S:ALL,noId:false,flash:false,fd:.3,hideT:false,zen:false,n:1,thr:2,drill:false,pace:false,goal:3,acc:'#67E8F9',bg:'oled',tf:1,tm:2,gap:1.75,rm:'irl',snd:true,vol:.6};
+const ACC=['#67E8F9','#4ADE80','#FBBF24','#A78BFA'],ACCD=['#0E7490','#15803D','#B45309','#6D28D9'];
+let D={set:Object.assign({},DEF),words:{},stats:{},flag:{},streak:{},hist:[]};
+try{const r=JSON.parse(localStorage.getItem(KEY)||'null');if(r){D=Object.assign(D,r);D.set=Object.assign({},DEF,r.set)}}catch(e){}
+const set=()=>D.set;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}}
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const P=$('#pair'),T=$('#time'),W=$('#word'),WI=$('#wi'),PB=$('#pace'),PBI=PB.firstElementChild;
+let st=0,cur=[],prev=null,t0=0,el=0,raf=0,ft=0,modal=null,sess={n:0,sum:0,best:null,rec:[],r:[0,0,0]};
+const fmt=ms=>(ms/1000).toFixed(2)+'s';
+const RC=['var(--g)','var(--y)','var(--r)'];
+const rate=ms=>{const s=ms/1000;return s<set().tf?0:s<=set().tm?1:2};
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('on'),1800)}
+function applyAcc(){
+  const TH=['oled','solid','aurora','forest','ocean','ember','rose','sunset','sage','meadow','lagoon','lavender','light'],LTH=['sunset','sage','meadow','lagoon','lavender','light'],NOANIM=['oled','solid','light'];if(!TH.includes(set().bg))set().bg='oled';
+  const b=set().bg,lt=LTH.includes(b),r=document.documentElement;
+  r.style.removeProperty('--acc');
+  r.dataset.bg=b;r.dataset.lt=lt?'1':'0';r.dataset.anim=NOANIM.includes(b)?'0':'1';
+  $('#sclk').style.display=set().zen?'none':'block';
+}
+
+let deck=[],deckSig='',warned=false;
+function rnd(a){return a[Math.random()*a.length|0]}
+function activePool(){const s=set(),out=[];for(const a of s.F)for(const b of s.S){if(s.noId&&a===b)continue;out.push(a+b)}return out}
+function avgT(k){const t=D.stats[k];return t?t.s/t.n:0}
+function weakSet(base){
+  const f=base.filter(k=>D.flag[k]);if(f.length)return f;
+  const t=base.filter(k=>D.stats[k]).sort((a,b)=>avgT(b)-avgT(a));
+  if(t.length)return t.slice(0,Math.max(8,Math.ceil(base.length*.05)));
+  return base;
+}
+function choose(src,base,out,avoid,strict){
+  let c=src.filter(k=>!out.includes(k)&&k!==avoid);
+  if(!c.length&&strict)c=src.filter(k=>!out.includes(k));
+  if(!c.length)c=base.filter(k=>!out.includes(k)&&k!==avoid);
+  if(!c.length)c=base.filter(k=>!out.includes(k));
+  return rnd(c.length?c:base);
+}
+function fromDeck(base,out,avoid){
+  const sig=base.join('');if(sig!==deckSig){deckSig=sig;deck=[]}
+  if(!deck.length){deck=base.slice();for(let i=deck.length-1;i>0;i--){const j=Math.random()*(i+1)|0;const x=deck[i];deck[i]=deck[j];deck[j]=x}}
+  let ix=deck.length-1;
+  for(let j=deck.length-1;j>=0;j--){if(deck[j]!==avoid&&!out.includes(deck[j])){ix=j;break}}
+  return deck.splice(ix,1)[0];
+}
+function pick(){
+  const base=activePool();if(!base.length)return null;
+  const s=set(),rm=s.rm,n=Math.min(s.n,base.length),out=[];
+  let wk=null;
+  if(rm==='drill'||rm==='hybrid'){
+    wk=weakSet(base);
+    if(rm==='drill'&&!warned&&!base.some(k=>D.flag[k])){warned=true;toast('No flagged pairs yet. Drilling your slowest or untested pairs.')}
+  }
+  for(let i=0;i<n;i++){
+    const avoid=i?out[i-1]:prev;let k;
+    if(rm==='full')k=fromDeck(base,out,avoid);
+    else{const src=rm==='drill'?wk:(rm==='hybrid'&&Math.random()<.4?wk:base);k=choose(src,base,out,avoid,rm==='drill')}
+    out.push(k);
+  }
+  return out;
+}
+function showLive(){return !set().hideT&&!set().zen}
+function tick(){
+  if(st!==1)return;
+  const e=performance.now()-t0;
+  if(showLive())T.textContent=fmt(e);
+  if(set().pace){PBI.style.transform='scaleX('+Math.min(e/(set().goal*1000),1)+')';PB.classList.toggle('over',e>set().goal*1000)}
+  raf=requestAnimationFrame(tick);
+}
+function hideWI(){WI.style.display='none';WI.value=''}
+function setWord(t){W.textContent=t;W.classList.remove('pop');if(t){void W.offsetWidth;W.classList.add('pop')}}
+function start(){
+  hideWI();
+  const c=pick();
+  if(!c){snd('err');toast('No pairs selected. Open settings.');return}
+  cur=c;prev=c[c.length-1];
+  P.className='run';P.style.setProperty('--n',c.length);
+  P.innerHTML=c.map(k=>'<span>'+k+'</span>').join('');P.style.setProperty('--gap',set().gap+'rem');
+  
+  T.textContent='';T.className='';W.textContent='';
+  PB.style.visibility=set().pace?'visible':'hidden';PBI.style.transform='scaleX(0)';PB.classList.remove('over');
+  document.body.classList.add('live');
+  st=1;t0=performance.now();clearTimeout(ft);snd('start');
+  if(set().flash)ft=setTimeout(()=>{if(st===1)P.classList.add('hid')},set().fd*1000);
+  raf=requestAnimationFrame(tick);
+}
+function stop(){
+  el=performance.now()-t0;st=2;snd('stop');cancelAnimationFrame(raf);clearTimeout(ft);
+  P.classList.remove('hid','pulse','run');
+  const per=el/cur.length,single=cur.length===1;
+  cur.forEach(k=>{
+    if(!single)return;const s=D.stats[k]||(D.stats[k]={n:0,s:0});s.n++;s.s+=per;
+    if(per/1000>set().thr){D.flag[k]=1;D.streak[k]=0}
+    else if(D.flag[k]&&(set().rm==='drill'||set().rm==='hybrid')){const c=(D.streak[k]||0)+1;if(c>=3){delete D.flag[k];delete D.streak[k];snd('grad',.3);toast(k+' graduated and left your weak pairs')}else D.streak[k]=c}
+  });
+  sess.n+=cur.length;if(single)sess.r[rate(per)]+=cur.length;sess.sum+=el;sess.rec.unshift({p:cur.join(' '),t:el});if(sess.rec.length>50)sess.rec.pop();
+  if(sess.best===null||per<sess.best)sess.best=per;
+  D.hist.push({p:cur.join(' '),t:Math.round(el),d:Date.now()});if(D.hist.length>3000)D.hist.shift();
+  save();
+  if(!set().zen){T.textContent=fmt(el);T.className=single?'r'+rate(per):'done'}else T.textContent='';
+  PB.style.visibility='hidden';
+  const w=cur.map(k=>D.words[k]).filter(Boolean).join('   ');
+  setWord(w);
+}
+function reset(){
+  cancelAnimationFrame(raf);clearTimeout(ft);st=0;cur=[];hideWI();
+  P.className='idle';P.style.removeProperty('--n');P.textContent='Press Spacebar to Start';
+  T.textContent='';T.className='';W.textContent='';PB.style.visibility='hidden';
+}
+function press(){if(st===1)stop();else start()}
+function openWI(){
+  WI.placeholder=cur.length>1?'Words for '+cur.join(' ')+', separated by spaces':'Word for '+cur[0];
+  WI.value=cur.map(k=>D.words[k]||'').join(' ').trim();
+  WI.style.display='block';WI.focus();WI.select();
+}
+function saveWI(){
+  const parts=WI.value.trim().split(/\s+/).filter(Boolean);
+  if(cur.length===1)D.words[cur[0]]=WI.value.trim();
+  else cur.forEach((k,i)=>{if(parts[i])D.words[k]=parts[i]});
+  if(cur.length===1&&!D.words[cur[0]])delete D.words[cur[0]];
+  save();snd('lookup');setWord(cur.map(k=>D.words[k]).filter(Boolean).join('   '));
+  hideWI();WI.blur();
+}
+
+addEventListener('keydown',e=>{
+  if(modal){if(e.key==='Escape')closeM();return}
+  if(e.target===WI){
+    if(e.key==='Enter'){e.preventDefault();saveWI()}
+    else if(e.key==='Escape'){e.preventDefault();hideWI();WI.blur()}
+    return;
+  }
+  if(e.code==='Space'){e.preventDefault();if(!e.repeat)press();return}
+  if((e.key==='d'||e.key==='D')&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();openLookup();return}
+  if(e.key==='Escape'||e.key==='r'||e.key==='R'){e.preventDefault();if(st!==0)snd('err');reset();return}
+  if(e.key==='Tab'){e.preventDefault();if(st===2)openWI();}
+});
+addEventListener('keyup',e=>{if(e.code==='Space'&&!modal&&e.target!==WI)e.preventDefault()});
+addEventListener('blur',()=>{});
+$$('#top button').forEach(b=>b.addEventListener('mousedown',e=>e.preventDefault()));
+
+/* modals */
+function openM(id){reset();if(id!=='lookup')snd('click');if(modal)$('#'+modal).classList.remove('on','out');modal=id;const o=$('#'+id);o.classList.remove('out');o.classList.add('on');if(document.activeElement)document.activeElement.blur()}
+function closeM(){if(!modal)return;snd('click');const o=$('#'+modal);modal=null;o.classList.remove('on');o.classList.add('out');setTimeout(()=>o.classList.remove('out'),230);if(document.activeElement)document.activeElement.blur()}
+$$('[data-close]').forEach(b=>b.addEventListener('click',closeM));
+$$('.ov').forEach(o=>o.addEventListener('mousedown',e=>{if(e.target===o)closeM()}));
+$('#bg').onclick=()=>{syncUI();openM('settings')};
+$('#bh').onclick=()=>{renderHeat();openM('heat')};
+$('#bs').onclick=()=>{renderStats();openM('drawer')};
+
+/* settings */
+function chips(id,key){
+  const c=$(id);c.innerHTML='';
+  L.forEach(l=>{const b=document.createElement('button');b.textContent=l;b.className=set()[key].includes(l)?'on':'';
+    b.onclick=()=>{const s=set()[key];set()[key]=s.includes(l)?s.replace(l,''):L.filter(x=>s.includes(x)||x===l).join('');save();syncUI()};c.appendChild(b)});
+}
+function syncUI(){
+  chips('#cf','F');chips('#cs','S');
+  $$('[data-k]').forEach(i=>{const v=set()[i.dataset.k];if(i.type==='checkbox')i.checked=v;else i.value=v});
+  $('#fdv').textContent=set().fd.toFixed(2)+'s';$('#vlv').textContent=Math.round(set().vol*100)+'%';
+  
+  
+}
+$('#pl').innerHTML=L.map(l=>'<option>'+l+'</option>').join('');
+$('#pl').onchange=()=>$$('.pk').forEach(k=>k.textContent=$('#pl').value);
+$('#pall').onclick=()=>{set().F=ALL;set().S=ALL;save();syncUI()};
+$('#pclr').onclick=()=>{set().F='';set().S='';save();syncUI()};
+$('#ps').onclick=()=>{set().F=$('#pl').value;set().S=ALL;save();syncUI()};
+$('#pe').onclick=()=>{set().S=$('#pl').value;set().F=ALL;save();syncUI()};
+$$('[data-k]').forEach(i=>i.addEventListener('input',()=>{
+  const k=i.dataset.k;let v=i.type==='checkbox'?i.checked:i.value;
+  if(i.type==='range'||i.type==='number'||k==='n'){v=parseFloat(v);if(isNaN(v))return}
+  set()[k]=v;if(k==='fd')$('#fdv').textContent=v.toFixed(2)+'s';save();applyAcc();
+}));
+$('#bex').onclick=()=>{$('#dj').value=JSON.stringify(D)};
+$('#bcp').onclick=()=>{const t=$('#dj');if(!t.value)t.value=JSON.stringify(D);t.select();try{navigator.clipboard.writeText(t.value).then(()=>toast('Copied'),()=>toast('Press Ctrl+C to copy'))}catch(e){toast('Press Ctrl+C to copy')}};
+$('#bim').onclick=()=>{
+  try{
+    const raw=$('#dj').value.trim();if(raw[0]!=='{'){importCSV(raw);return}const r=JSON.parse(raw);
+    const jl=[];for(const k in (r.words||{})){const w=String(r.words[k]).trim().toLowerCase();if(/^[A-Za-z]{2}$/.test(k)&&w){D.words[k.toUpperCase()]=w;jl.push([k.toUpperCase(),w])}}
+    if(r.stats)D.stats=r.stats;if(r.flag)D.flag=r.flag;if(r.hist)D.hist=r.hist;
+    if(r.set)D.set=Object.assign({},DEF,r.set);
+    save();applyAcc();syncUI();importDone(jl);
+  }catch(e){snd('err');toast('That JSON could not be read')}
+};
+
+function L1(s){
+  const t=String(s||'').trim().replace(/^"|"$/g,'').split(/[\s\/|(,;\-]+/)[0].toUpperCase();
+  return /^[A-X]$/.test(t)?t:'';
+}
+function parseTable(raw){
+  raw=raw.replace(/^\uFEFF/,'');
+  const first=raw.split(/\r?\n/).slice(0,6).join('\n');
+  const dl=['\t',',',';'].map(d=>[d,first.split(d).length]).sort((a,b)=>b[1]-a[1])[0][0];
+  const rows=[];let row=[],f='',q=false;
+  for(let i=0;i<raw.length;i++){
+    const c=raw[i];
+    if(q){if(c==='"'){if(raw[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+    else if(c==='"')q=true;
+    else if(c===dl){row.push(f);f=''}
+    else if(c==='\n'||c==='\r'){if(c==='\r'&&raw[i+1]==='\n')i++;row.push(f);rows.push(row);row=[];f=''}
+    else f+=c;
+  }
+  row.push(f);rows.push(row);
+  return rows.filter(r=>r.some(x=>String(x).trim()));
+}
+function importDone(list){
+  save();
+  const n=list.length;
+  $('#impt').textContent=n?'Import complete':'Nothing imported';
+  $('#impm').textContent=n?'Successfully imported '+n+' letter pair words!':'No valid letter pair words were found. Check the format in Tutorial & Help.';
+  $('#impp').innerHTML=list.slice(0,8).map(x=>'<span class="pk2">'+x[0]+'</span>  '+String(x[1]).replace(/</g,'&lt;')).join('<br>')+(n>8?'<br>and '+(n-8)+' more':'');
+  openM('imp');
+}
+function importCSV(raw){
+  const rows=parseTable(raw),list=[];
+  let hi=-1,cols=null;
+  for(let i=0;i<Math.min(rows.length,6);i++){
+    const m={};let n=0;
+    rows[i].forEach((c,j)=>{if(j>0){const l=L1(c);if(l){m[j]=l;n++}}});
+    if(n>=6){hi=i;cols=m;break}
+  }
+  if(hi>=0){
+    for(let i=hi+1;i<rows.length;i++){
+      const r=rows[i],a=L1(r[0]);if(!a)continue;
+      for(const j in cols){
+        const w=String(r[j]||'').trim().replace(/^"|"$/g,'').trim().toLowerCase();
+        if(w)list.push([a+cols[j],w]);
+      }
+    }
+  }else{
+    rows.forEach(r=>{
+      const k=String(r[0]||'').trim().toUpperCase();
+      if(/^[A-X]{2}$/.test(k)){const w=String(r[1]||'').trim().replace(/^"|"$/g,'').trim().toLowerCase();if(w)list.push([k,w])}
+    });
+  }
+  list.forEach(x=>{D.words[x[0]]=x[1]});
+  importDone(list);
+}
+$('#bfile').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const rd=new FileReader();
+  rd.onload=()=>{$('#dj').value=String(rd.result);e.target.value='';$('#bim').click()};
+  rd.onerror=()=>toast('That file could not be read');
+  rd.readAsText(f);
+};
+function importCSVOld(raw){
+  let c=0;
+  raw.split(/\r?\n/).forEach(ln=>{
+    const m=ln.match(/^\s*"?([A-Za-z]{2})"?\s*[,\t;]\s*(.+?)\s*$/);if(!m)return;
+    const k=m[1].toUpperCase();if(!/^[A-X]{2}$/.test(k))return;
+    D.words[k]=m[2].replace(/^"|"$/g,'').replace(/""/g,'"').trim();c++;
+  });
+  save();toast(c?'Imported '+c+' words':'No valid pair,word rows found');
+}
+$('#bcsv').onclick=()=>{$('#dj').value='pair,word\n'+Object.keys(D.words).sort().map(k=>k+',"'+D.words[k].replace(/"/g,'""')+'"').join('\n')};
+$('#bhelp').onclick=()=>openM('help');
+let pend=null;
+const ACT={
+  stats:{t:'Clear session history and heatmap?',p:'This permanently deletes the heatmap data, average times, weak-pair flags, attempt history and the session log. Your saved words, settings and theme stay as they are.',y:'Yes, clear stats',f:()=>{D.stats={};D.flag={};D.streak={};D.hist=[];sess={n:0,sum:0,best:null,rec:[],r:[0,0,0]};prev=null}},
+  words:{t:'Clear the word dictionary?',p:'This permanently deletes every saved mnemonic word. Your stats, settings and theme stay as they are.',y:'Yes, clear words',f:()=>{D.words={}}},
+  all:{t:'Factory reset?',p:'This permanently wipes all words, heatmap data, session stats, custom settings and theme choices, and restores every default.',y:'Yes, reset everything',f:()=>{D={set:Object.assign({},DEF),words:{},stats:{},flag:{},streak:{},hist:[]};sess={n:0,sum:0,best:null,rec:[],r:[0,0,0]};prev=null}}
+};
+function ask(k){pend=k;const a=ACT[k];$('#ct').textContent=a.t;$('#cp').textContent=a.p;$('#cyes').textContent=a.y;openM('confirm')}
+$('#bc1').onclick=()=>ask('stats');
+$('#bc2').onclick=()=>ask('words');
+$('#bc3').onclick=()=>ask('all');
+$('#cno').onclick=()=>{syncUI();openM('settings')};
+$('#cyes').onclick=()=>{if(!pend)return;ACT[pend].f();pend=null;save();applyAcc();closeM();toast('Done')};
+
+/* sound engine */
+let AC=null,MG=null;
+function actx(){
+  if(!AC){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;try{AC=new C();MG=AC.createGain();MG.connect(AC.destination)}catch(e){AC=null;return null}}
+  if(AC.state==='suspended')AC.resume();
+  return AC;
+}
+['keydown','pointerdown','touchend','click'].forEach(ev=>addEventListener(ev,()=>{actx()},true));
+function tn(f,t,d,type,v,f2){
+  const o=AC.createOscillator(),g=AC.createGain();
+  o.type=type;o.frequency.setValueAtTime(f,t);
+  if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);
+  g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(v,t+.004);g.gain.exponentialRampToValueAtTime(0.0001,t+d);
+  o.connect(g);g.connect(MG);o.start(t);o.stop(t+d+.02);
+}
+function snd(n,dl){
+  const s=set();if(!s.snd||!s.vol)return;
+  const a=actx();if(!a)return;
+  MG.gain.value=Math.pow(s.vol,1.6);
+  const t=a.currentTime+(dl||0)+.005;
+  switch(n){
+    case 'start':tn(1500,t,.03,'triangle',.22,700);tn(220,t,.04,'sine',.18);break;
+    case 'stop':tn(392,t,.45,'sine',.22);tn(587.33,t+.02,.4,'sine',.12);tn(196,t,.5,'sine',.1);break;
+    case 'click':tn(900,t,.025,'triangle',.12,500);break;
+    case 'grad':[523.25,659.25,783.99].forEach((f,i)=>{tn(f,t+i*.09,.32,'sine',.16);tn(f*2,t+i*.09,.2,'sine',.04)});break;
+    case 'err':tn(150,t,.07,'sine',.28,110);tn(150,t+.11,.07,'sine',.24,110);break;
+    case 'lookup':tn(2400,t,.05,'sine',.1);tn(3200,t+.045,.05,'sine',.07);break;
+  }
+}
+document.addEventListener('click',e=>{
+  const t=e.target.closest&&e.target.closest('button,select,input.tg');if(!t)return;
+  if(t.hasAttribute('data-close')||/^(bh|bs|bg|bd|bhelp|bc1|bc2|bc3|cno|cyes)$/.test(t.id))return;
+  snd('click');
+});
+const VR=document.querySelector('[data-k="vol"]');let vt=0;
+VR.addEventListener('input',()=>{$('#vlv').textContent=Math.round(VR.value*100)+'%';clearTimeout(vt);vt=setTimeout(()=>snd('click'),60)});
+
+/* heatmap */
+function renderHeat(){
+  const g=$('#hm');let h='<div></div>'+L.map(l=>'<div>'+l+'</div>').join('');
+  const hc=['#1E8E4E','#B8941F','#B94646'];
+  for(const a of L){h+='<div>'+a+'</div>';
+    for(const b of L){const k=a+b,t=D.stats[k];
+      if(!t){h+='<div data-p="'+k+'" style="background:var(--line)"></div>';continue}
+      h+='<div data-p="'+k+'" style="background:'+hc[rate(t.s/t.n)]+'"></div>';}}
+  g.innerHTML=h;
+  $('#hmi').textContent='Hover or tap a cell for details.';
+  $('#hl').innerHTML='<span style="color:#4ADE80">Fast under '+set().tf+'s</span>, <span style="color:#FBBF24">medium up to '+set().tm+'s</span>, <span style="color:#F87171">slow above that</span>.';
+}
+function hmInfo(e){
+  const p=e.target.dataset&&e.target.dataset.p;if(!p)return;
+  const t=D.stats[p],w=D.words[p];
+  $('#hmi').textContent=p+(w?'  '+String(w).toLowerCase():'')+'  '+(t?(t.s/t.n/1000).toFixed(2)+'s over '+t.n+' attempt'+(t.n>1?'s':''):'no data yet');
+}
+$('#hm').addEventListener('mouseover',hmInfo);
+$('#hm').addEventListener('click',hmInfo);
+
+/* stats */
+function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+function slowest(){
+  const cut=Date.now()-172800000,m={};
+  D.hist.forEach(h=>{if(h.d>=cut&&h.p.indexOf(' ')<0){const o=m[h.p]||(m[h.p]={n:0,s:0});o.n++;o.s+=h.t}});
+  return Object.keys(m).map(k=>({k:k,n:m[k].n,a:m[k].s/m[k].n})).sort((x,y)=>y.a-x.a).slice(0,10);
+}
+function renderStats(){
+  const b=$('#sb');
+  if(set().zen){b.innerHTML='<div class="mut">Zen mode is on. Turn it off in settings to see stats.</div>';return}
+  const avg=sess.n?sess.sum/sess.n:0,wk=Object.keys(D.flag),wd=Object.keys(D.words),sl=slowest();
+  let h='<div class="stat"><span>Pairs completed</span><span>'+sess.n+'</span></div>'+
+  '<div class="stat"><span>Average per pair</span><span>'+(sess.n?fmt(avg):'-')+'</span></div>'+
+  '<div class="stat"><span>Best per pair</span><span>'+(sess.best!==null?fmt(sess.best):'-')+'</span></div>'+
+  '<div class="stat"><span>Fast / medium / slow</span><span><span style="color:#4ADE80">'+sess.r[0]+'</span> / <span style="color:#FBBF24">'+sess.r[1]+'</span> / <span style="color:#F87171">'+sess.r[2]+'</span></span></div>'+
+  '<div class="stat"><span>Weak pairs flagged</span><span>'+wk.length+'</span></div>'+
+  '<h3>Slowest pairs, last 48 hours</h3>'+(sl.length?'<div class="lr hd"><span>#</span><span>Pair</span><span>Word</span><span>Avg</span></div>'+sl.map((r,i)=>'<div class="lr"><span class="rk">'+(i+1)+'</span><span class="lp">'+r.k+'</span><span class="lwd">'+(D.words[r.k]?esc(String(D.words[r.k]).toLowerCase()):'-')+'</span><span class="lt" style="color:'+RC[rate(r.a)]+'">'+fmt(r.a)+'</span></div>').join(''):'<div class="mut">No single-pair attempts in the last 48 hours.</div>')+
+  '<h3>Recent</h3>'+(sess.rec.length?sess.rec.slice(0,20).map(r=>'<div class="stat"><span>'+r.p+'</span><span style="color:'+(r.p.indexOf(' ')>-1?'var(--acc)':RC[rate(r.t)])+'">'+fmt(r.t)+'</span></div>').join(''):'<div class="mut">No attempts yet.</div>')+
+  '<h3>Weak pairs</h3><div class="mut">'+(wk.sort().map(k=>k+(D.streak[k]?' ('+D.streak[k]+'/3)':'')).join('  ')||'None yet.')+'</div>'+
+  '<h3>Memo words ('+wd.length+')</h3><div class="mut">'+(wd.sort().map(k=>k+' '+esc(String(D.words[k]).toLowerCase())).join('<br>')||'Press Tab after stopping to save a word.')+'</div>';
+  b.innerHTML=h;
+}
+
+/* word lookup */
+const lq=$('#lq'),lw=$('#lw'),ls=$('#ls');
+function lkRefresh(){
+  const k=lq.value.toUpperCase().replace(/[^A-X]/g,'').slice(0,2);lq.value=k;
+  if(k.length<2){ls.textContent='Type two letters (A to X).';lw.disabled=true;lw.value='';return}
+  lw.disabled=false;lw.value=D.words[k]||'';if(document.activeElement===lq)snd('lookup');
+  ls.textContent=D.words[k]?'Saved word for '+k+'. Edit it below.':'No word saved for '+k+' yet.';
+}
+function lkSave(){
+  const k=lq.value;if(k.length<2)return;
+  const w=lw.value.trim().toLowerCase();
+  if(w)D.words[k]=w;else delete D.words[k];
+  save();snd('lookup');toast(w?k+' saved':k+' removed');
+}
+lq.addEventListener('input',lkRefresh);
+lq.addEventListener('keydown',e=>{if(e.key==='Enter'&&lq.value.length===2){e.preventDefault();lw.focus();lw.select()}});
+lw.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();lkSave();lq.value='';lkRefresh();lq.focus()}});
+$('#lsave').onclick=lkSave;
+$('#ldel').onclick=()=>{lw.value='';lkSave();lkRefresh()};
+function openLookup(){
+  const k=cur.length===1?cur[0]:'';
+  openM('lookup');snd('lookup');lq.value=k;lkRefresh();
+  setTimeout(()=>(k?lw:lq).focus(),60);
+}
+$('#bd').onclick=openLookup;
+
+/* tooltips */
+const TIP=$('#tip');
+function showTip(el){
+  TIP.textContent=el.dataset.tip;TIP.style.left='0px';TIP.style.top='0px';
+  const r=el.getBoundingClientRect(),w=TIP.offsetWidth,h=TIP.offsetHeight;
+  let x=Math.max(8,Math.min(innerWidth-w-8,r.left+r.width/2-w/2)),y=r.top-h-10;
+  if(y<8)y=r.bottom+10;
+  TIP.style.left=x+'px';TIP.style.top=y+'px';TIP.classList.add('on');
+}
+const hideTip=()=>TIP.classList.remove('on');
+document.addEventListener('mouseover',e=>{const i=e.target.closest&&e.target.closest('.inf');if(i)showTip(i)});
+document.addEventListener('mouseout',e=>{if(e.target.closest&&e.target.closest('.inf'))hideTip()});
+document.addEventListener('click',e=>{const i=e.target.closest&&e.target.closest('.inf');if(i){e.preventDefault();e.stopPropagation();showTip(i)}else hideTip()},true);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')hideTip()},true);
+
+/* session clock */
+const S0=Date.now(),SC=$('#sclk');
+function clk(){
+  const q=Math.floor((Date.now()-S0)/1000),h=q/3600|0,m=(q%3600)/60|0,x=q%60,p=n=>String(n).padStart(2,'0');
+  SC.textContent=(h?h+':'+p(m):m)+':'+p(x);
+}
+clk();setInterval(clk,1000);
+applyAcc();
+})();
+</script>
+</body>
+</html>
