@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>3BLD Pair Trainer</title>
+<script>try{var _d=JSON.parse(localStorage.getItem('bld-pairs-v1')||'null'),_b=(_d&&_d.set&&_d.set.bg)||'oled',_h=document.documentElement;_h.dataset.bg=_b;_h.dataset.lt=['sunset','sage','meadow','lagoon','lavender','light'].indexOf(_b)>-1?'1':'0';_h.dataset.anim=['oled','solid','light'].indexOf(_b)>-1?'0':'1'}catch(e){}</script>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0B0E14;--panel:#121722;--line:#222B3B;--fg:#D3D8E0;--muted:#8D96A8;--acc:#67E8F9;--on:#07202A;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -97,8 +98,6 @@ html[data-bg=light]{--bg:#FAFAF8;--panel:#FFFFFF;--line:#E3E3DE;--acc:#0E7490;--
 html[data-lt="1"] #pair.run{text-shadow:0 0 .3em color-mix(in srgb,var(--acc) 30%,transparent)}
 #time{font-weight:600}
 #word{text-transform:lowercase}
-#scramble{min-height:1.2em;max-width:min(840px,92vw);color:var(--muted);font-size:.72rem;line-height:1.5;letter-spacing:.04em;word-spacing:.25em}
-#scramble b{color:var(--acc);font-weight:600}
 .btnlike{display:inline-block;border:1px solid var(--line);border-radius:6px;padding:.4em .8em;cursor:pointer;transition:border-color .18s}
 .btnlike:hover{border-color:var(--acc)}
 .pk2{color:var(--acc);font-weight:600}
@@ -137,7 +136,8 @@ kbd{border:1px solid var(--line);border-radius:4px;padding:0 .35em;color:var(--a
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001s!important;transition-duration:.001s!important}#bgfx i{animation:none!important}}
 
 input,textarea{user-select:text;-webkit-user-select:text}
-#sclk{position:fixed;top:env(safe-area-inset-top,0px);left:0;padding:1rem .95rem;color:var(--muted);font-size:.85rem;letter-spacing:.06em;font-variant-numeric:tabular-nums;opacity:.85;z-index:2;pointer-events:none}
+#sclk{position:fixed;top:env(safe-area-inset-top,0px);left:0;padding:1rem .95rem;color:var(--muted);font-size:.85rem;letter-spacing:.06em;font-variant-numeric:tabular-nums;opacity:.85;z-index:2;text-decoration:none;cursor:pointer;transition:color .18s,opacity .18s}
+#sclk:hover{color:var(--acc);opacity:1}
 #settings .box{width:min(620px,100%);padding:1.8rem 1.5rem 2.4rem}
 #settings .box h2{font-size:1.7rem;font-weight:700;margin:0 0 .2rem;letter-spacing:-.01em}
 .sec{font-size:1.2rem;font-weight:700;margin:2.2rem .25rem .75rem}
@@ -173,11 +173,94 @@ input,textarea{user-select:text;-webkit-user-select:text}
 .lt{font-weight:600;font-variant-numeric:tabular-nums}
 .fld{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:.7em .9em;font-size:1.1rem;margin:.4rem 0}
 #lq{text-transform:uppercase;letter-spacing:.25em;text-align:center;font-size:1.6rem;font-weight:600}
+/* ---------- intro ---------- */
+#intro{position:fixed;inset:0;z-index:60;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;transition:opacity .6s cubic-bezier(.4,0,.2,1),transform .6s cubic-bezier(.4,0,.2,1),filter .6s cubic-bezier(.4,0,.2,1)}
+#intro.out{opacity:0;transform:scale(1.05);filter:blur(10px);pointer-events:none}
+.ilogo{position:relative;width:100px;height:100px}
+.igrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;width:100%;height:100%}
+.igrid i{border-radius:8px;background:var(--acc);opacity:0;transform:scale(.2);animation:itile .55s cubic-bezier(.34,1.56,.64,1) forwards;animation-delay:calc(var(--d) * 80ms + .15s);--o:.5}
+.igrid i:nth-child(even){--o:.78}
+.igrid i:nth-child(5){--o:1;box-shadow:0 0 28px color-mix(in srgb,var(--acc) 55%,transparent)}
+@keyframes itile{to{opacity:var(--o);transform:none}}
+.iband{position:absolute;left:-14px;right:-14px;top:50%;height:24px;margin-top:-12px;background:var(--fg);border-radius:7px;transform:scaleX(0);transform-origin:left;box-shadow:0 6px 20px rgba(0,0,0,.35);animation:iband .6s cubic-bezier(.65,0,.35,1) 1.2s forwards}
+@keyframes iband{to{transform:scaleX(1)}}
+.iword{font-size:2.6rem;font-weight:600;letter-spacing:.35em;margin-right:-.35em;opacity:0;transform:translateY(12px);animation:iup .7s cubic-bezier(.32,.72,0,1) 1.65s forwards}
+.isub{color:var(--muted);font-size:.8rem;letter-spacing:.22em;opacity:0;transform:translateY(8px);animation:iup .7s cubic-bezier(.32,.72,0,1) 1.9s forwards}
+@keyframes iup{to{opacity:1;transform:none}}
+/* ---------- entrance & ambient ---------- */
+body.ready #top button{animation:tin .6s cubic-bezier(.32,.72,0,1) backwards}
+body.ready #top button:nth-child(1){animation-delay:.05s}body.ready #top button:nth-child(2){animation-delay:.12s}body.ready #top button:nth-child(3){animation-delay:.19s}body.ready #top button:nth-child(4){animation-delay:.26s}
+body.ready #sclk,body.ready #guide{animation:pin .8s cubic-bezier(.32,.72,0,1) .3s backwards}
+@keyframes tin{from{opacity:0;transform:translateY(-12px) scale(.7)}}
+@keyframes pin{from{opacity:0;transform:translateY(14px)}}
+#pair.idle{animation:breathe 3.6s ease-in-out infinite}
+body.ready:not(.live) #pair.idle{animation:pin .8s cubic-bezier(.32,.72,0,1) .2s backwards,breathe 3.6s ease-in-out 1s infinite}
+@keyframes breathe{0%,100%{opacity:.5}50%{opacity:1}}
+/* ---------- top icons ---------- */
+#top button{border-radius:12px;transition:transform .4s cubic-bezier(.34,1.56,.64,1),color .2s,background-color .25s}
+#top button:hover{color:var(--acc);background:color-mix(in srgb,var(--acc) 14%,transparent);transform:translateY(-2px) scale(1.15)}
+#bg:hover{transform:rotate(90deg) scale(1.15)}
+#bh:hover{transform:rotate(-8deg) scale(1.2)}
+#bs:hover{transform:translateY(-2px) scale(1.2,1.1)}
+#top button:active{transform:scale(.9)}
+/* ---------- global polish ---------- */
+html{transition:background-color .6s}
+body{transition:background-color .6s,color .4s}
+.box{transition:background-color .4s,border-color .4s;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+button:hover{transform:translateY(-1px)}
+button:active{transform:scale(.97)}
+.chips button{transition:background-color .18s,color .18s,border-color .18s,transform .25s cubic-bezier(.34,1.56,.64,1)}
+.chips button:hover{transform:scale(1.1)}
+.grp>.it{transition:background-color .2s}
+.grp>label.it:hover,.grp>.it:hover{background:color-mix(in srgb,var(--acc) 6%,transparent)}
+.tg:hover{filter:brightness(1.15)}
+input[type=number],select,textarea,.fld,#wi{transition:border-color .2s,box-shadow .25s}
+input:focus,select:focus,textarea:focus{border-color:var(--acc);box-shadow:0 0 0 3px color-mix(in srgb,var(--acc) 22%,transparent);outline:none}
+#wi{animation:sin .22s cubic-bezier(.32,.72,0,1)}
+#toast{transform:translateX(-50%) translateY(10px);transition:opacity .25s,transform .4s cubic-bezier(.32,.72,0,1);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+#toast.on{transform:translateX(-50%) translateY(0)}
+@keyframes sin{from{opacity:0;transform:translateY(14px)}}
+#settings.on .box>*{animation:sin .55s cubic-bezier(.32,.72,0,1) backwards}
+#settings.on .box>:nth-child(2){animation-delay:.05s}#settings.on .box>:nth-child(3){animation-delay:.08s}#settings.on .box>:nth-child(4){animation-delay:.11s}#settings.on .box>:nth-child(5){animation-delay:.14s}#settings.on .box>:nth-child(6){animation-delay:.17s}#settings.on .box>:nth-child(7){animation-delay:.2s}#settings.on .box>:nth-child(8){animation-delay:.23s}#settings.on .box>:nth-child(9){animation-delay:.26s}#settings.on .box>:nth-child(10){animation-delay:.29s}#settings.on .box>:nth-child(n+11){animation-delay:.32s}
+#drawer.on .stat,#drawer.on .lr,#help.on .box>*{animation:sin .45s cubic-bezier(.32,.72,0,1) backwards}
+#heat.on #hm div{animation:cell .5s cubic-bezier(.34,1.56,.64,1) backwards}
+@keyframes cell{from{opacity:0;transform:scale(.4)}}
+#hm div[data-p]{transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .18s}
+#hm div[data-p]:hover{transform:scale(1.5);position:relative;z-index:3;border-radius:3px;box-shadow:0 4px 14px rgba(0,0,0,.5)}
+#time.r0,#time.r1,#time.r2,#time.done{animation:tpop .24s cubic-bezier(.34,1.56,.64,1)}
+#time.failed{animation:shk .34s cubic-bezier(.36,.07,.19,.97)}
+@keyframes tpop{from{opacity:.4;transform:scale(1.18)}}
+@keyframes shk{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+@media (prefers-reduced-motion:reduce){#intro{display:none}#pair.idle{animation:none!important}}
+.ilogo{width:clamp(130px,36vw,180px);height:clamp(130px,36vw,180px);animation:ilogo .9s cubic-bezier(.34,1.56,.64,1) backwards,ibob 3.4s ease-in-out 1s infinite}
+@keyframes ilogo{from{opacity:0;transform:scale(.5) rotate(-12deg)}}
+@keyframes ibob{50%{transform:translateY(-6px)}}
+.igrid{position:relative;gap:clamp(8px,2.2vw,12px)}
+.igrid i{border-radius:clamp(8px,2vw,12px)}
+.iband{left:-22px;right:-22px;height:clamp(26px,7vw,38px);margin-top:calc(clamp(26px,7vw,38px) / -2)}
+.iring{position:absolute;inset:-34px;border-radius:50%;border:1.5px dashed color-mix(in srgb,var(--acc) 45%,transparent);opacity:0;transform:scale(.6);animation:iring .9s cubic-bezier(.32,.72,0,1) .1s forwards,ispin 18s linear 1s infinite}
+@keyframes iring{to{opacity:1;transform:scale(1)}}
+@keyframes ispin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.iglow{position:absolute;inset:-60px;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--acc) 32%,transparent),transparent);opacity:0;animation:iglow 3s ease-in-out .3s infinite}
+@keyframes iglow{0%{opacity:0;transform:scale(.7)}30%{opacity:.8;transform:scale(1.05)}65%{opacity:.45;transform:scale(.95)}100%{opacity:0;transform:scale(.7)}}
+.iword{font-size:clamp(2.6rem,10vw,4.4rem);opacity:1;transform:none;animation:none;display:flex}
+.iword span{display:inline-block;opacity:0;transform:translateY(26px) scale(.9);filter:blur(8px);animation:ilet .75s cubic-bezier(.32,.72,0,1) forwards;animation-delay:calc(1.6s + var(--l) * 90ms)}
+@keyframes ilet{to{opacity:1;transform:none;filter:blur(0)}}
+.iby{color:var(--muted);font-size:.85rem;letter-spacing:.12em;opacity:0;transform:translateY(8px);animation:iup .7s cubic-bezier(.32,.72,0,1) 2.3s forwards;margin-top:-.6rem}
+.iby b{color:var(--acc);font-weight:600}
+.ihint{position:absolute;bottom:calc(2rem + env(safe-area-inset-bottom,0px));left:0;right:0;text-align:center;color:var(--muted);font-size:.75rem;letter-spacing:.14em;opacity:0;animation:ihint 1.6s ease-in-out .5s infinite alternate}
+@keyframes ihint{from{opacity:.3}to{opacity:.9}}
 </style>
 </head>
 <body>
+<div id="intro" aria-hidden="true">
+<div class="ilogo"><div class="iglow"></div><div class="iring"></div><div class="igrid"><i style="--d:0"></i><i style="--d:1"></i><i style="--d:2"></i><i style="--d:1"></i><i style="--d:2"></i><i style="--d:3"></i><i style="--d:2"></i><i style="--d:3"></i><i style="--d:4"></i></div><div class="iband"></div></div>
+<div class="iword"><span style="--l:0">3</span><span style="--l:1">B</span><span style="--l:2">L</span><span style="--l:3">D</span></div>
+<div class="isub">Letter pair trainer</div>
+<div class="iby">by <b>nBananaBoss</b></div>
+</div>
 <div id="bgfx"><i></i><i></i><i></i></div>
-<div id="sclk">0:00</div>
+<a id="sclk" href="https://cstimer.net/" target="_blank" rel="noopener noreferrer" tabindex="-1" title="Open csTimer">0:00</a>
 <div id="top">
 <button id="bd" tabindex="-1" aria-label="Word lookup" title="Word lookup [D]">Aa</button>
 <button id="bh" tabindex="-1" aria-label="Heatmap" title="Heatmap">▦</button>
@@ -187,7 +270,6 @@ input,textarea{user-select:text;-webkit-user-select:text}
 <div id="main">
 <div id="pace"><i></i></div>
 <div id="pair" class="idle">Press Spacebar to Start</div>
-<div id="scramble"></div>
 <div id="time"></div>
 <div id="word"></div>
 <div id="wrap"><input id="wi" type="text" autocomplete="off" spellcheck="false"></div>
@@ -199,10 +281,10 @@ input,textarea{user-select:text;-webkit-user-select:text}
 <div class="ov" id="settings"><div class="box" role="dialog" aria-label="Settings">
 <h2>Settings <button data-close>Close</button></h2>
 
-<div class="sec">Practice &amp; Randomization</div>
+<div class="sec">Practice &amp; Randomisation</div>
 <div class="grp">
-<div class="it"><span class="lb">Randomization mode<i class="inf" tabindex="0" data-tip="How the next pair is chosen. Missed-Word Review uses pairs you failed; Spaced Repetition brings back pairs based on recall speed. See Tutorial for full details.">i</i></span>
-<select data-k="rm"><option value="irl">3BLD IRL (True Random)</option><option value="full">Full Pool Non-Repeating</option><option value="hybrid">Weak-Pair Hybrid Split (60/40 Split)</option><option value="drill">Strict Weak-Pairs Drill Only</option><option value="missed">Missed-Word Review</option><option value="spaced">Spaced Repetition</option><option value="scramble">Real Orozco Corner Memo</option></select></div>
+<div class="it"><span class="lb">Randomisation mode<i class="inf" tabindex="0" data-tip="How the next pair is chosen. Missed-Word Review uses pairs you failed; Spaced Repetition brings back pairs based on recall speed. See Tutorial for full details.">i</i></span>
+<select data-k="rm"><option value="irl">3BLD IRL (True Random)</option><option value="full">Full Pool Non-Repeating</option><option value="hybrid">Weak-Pair Hybrid Split (60/40 Split)</option><option value="drill">Strict Weak-Pairs Drill Only</option><option value="missed">Missed-Word Review</option><option value="spaced">Spaced Repetition</option></select></div>
 <div class="it"><span class="lb">Pairs per attempt</span><select data-k="n"><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
 <div class="it"><span class="lb">Spacing between pairs</span><span class="ctl"><input type="number" min="0.5" max="4" step="0.25" data-k="gap"><span class="mut">rem</span></span></div>
 <label class="it"><span class="lb">Exclude identical pairs<i class="inf" tabindex="0" data-tip="Skips AA, BB, CC and the other doubled pairs.">i</i></span><input type="checkbox" class="tg" data-k="noId"></label>
@@ -224,7 +306,7 @@ input,textarea{user-select:text;-webkit-user-select:text}
 <div class="it"><span class="lb">Flash duration</span><span class="ctl"><input type="range" min="0.1" max="1" step="0.05" data-k="fd"><span id="fdv" class="mut"></span></span></div>
 <label class="it"><span class="lb">Hide timer while running<i class="inf" tabindex="0" data-tip="Keeps timing in the background and shows only the final time when you stop.">i</i></span><input type="checkbox" class="tg" data-k="hideT"></label>
 <label class="it"><span class="lb">Zen mode<i class="inf" tabindex="0" data-tip="Hides times, stats and the session clock for pure recognition practice.">i</i></span><input type="checkbox" class="tg" data-k="zen"></label>
-<label class="it"><span class="lb">Target pace bar<i class="inf" tabindex="0" data-tip="Shows a thin progress bar toward your goal time while the timer runs.">i</i></span><input type="checkbox" class="tg" data-k="pace"></label>
+<label class="it"><span class="lb">Target pace bar<i class="inf" tabindex="0" data-tip="Shows a thin progress bar towards your goal time while the timer runs.">i</i></span><input type="checkbox" class="tg" data-k="pace"></label>
 <div class="it"><span class="lb">Goal time</span><span class="ctl"><input type="number" min="0.2" max="20" step="0.1" data-k="goal"><span class="mut">s</span></span></div>
 </div>
 
@@ -238,7 +320,7 @@ input,textarea{user-select:text;-webkit-user-select:text}
 
 <div class="sec">Sound</div>
 <div class="grp">
-<label class="it"><span class="lb">Sound Effects<i class="inf" tabindex="0" data-tip="Soft synthesized clicks, a completion pulse and a graduation flourish. Nothing is downloaded.">i</i></span><input type="checkbox" class="tg" data-k="snd"></label>
+<label class="it"><span class="lb">Sound Effects<i class="inf" tabindex="0" data-tip="Soft synthesised clicks, a completion pulse and a graduation flourish. Nothing is downloaded.">i</i></span><input type="checkbox" class="tg" data-k="snd"></label>
 <div class="it"><span class="lb">Master volume</span><span class="ctl"><input type="range" min="0" max="1" step="0.01" data-k="vol"><span id="vlv" class="mut"></span></span></div>
 </div>
 
@@ -292,19 +374,18 @@ C,cat,cabin,cucumber</pre>
 <p>Saved words automatically appear directly below the timer and pair as soon as you stop the timer. In batch mode, each pair’s word shows in order.</p>
 <h3>Keyboard shortcuts</h3>
 <ul><li><kbd>[Space]</kbd> Cycle/Stop: start, stop, then load the next pair</li><li><kbd>[Esc]</kbd> or <kbd>[R]</kbd> Reset: cancel the run without saving a time</li><li><kbd>[Tab]</kbd> Edit Word after stopping, then <kbd>[Enter]</kbd> to save</li><li><kbd>[D]</kbd> Lookup: find or edit any pair&rsquo;s word</li><li><kbd>[Y U I O P J H K L N M B]</kbd>, punctuation keys, or <kbd>[8 9 0]</kbd>: mark the active pair as failed and reveal its saved word without logging a time</li></ul>
-<h3>Randomization modes</h3>
+<h3>Randomisation modes</h3>
 <ul><li><b>3BLD IRL (True Random)</b>: every draw is random from your active pool, with no forced cycling. The same pair never appears twice in a row.</li><li><b>Full Pool Non-Repeating</b>: shuffles the whole pool and deals every pair once before any repeats.</li><li><b>Weak-Pair Hybrid Split (60/40)</b>: about 40% of draws come from your weak pairs and 60% from the full pool.</li><li><b>Strict Weak-Pairs Drill Only</b>: only weak pairs. With none flagged yet, it uses your slowest tested pairs, or untested pairs on a fresh start.</li><li><b>Missed-Word Review</b>: shows only pairs marked failed with a right-side fail key. Two successful single-pair recalls in a row remove a pair from this list.</li><li><b>Spaced Repetition</b>: introduces unreviewed pairs, then prioritises pairs that are due. Faster recalls are scheduled further into the future; a failed pair becomes due immediately.</li></ul>
 <h3>Weak pairs and graduation</h3>
 <p>A single pair slower than the weak-pair threshold is flagged. In Hybrid or Drill mode, finishing a flagged pair under the threshold 3 times in a row graduates it: it is removed from the weak list and the stats count.</p>
 <h3>Heatmap that follows improvement</h3>
 <p>The heatmap uses a recent-weighted average rather than treating every old attempt equally. Each new single-pair time shifts the colour toward your current speed, so a pair can genuinely move from red to green as you improve. Your complete history remains available for the session and leaderboard, but it does not permanently hold the heatmap back.</p>
+<h3>Failed pairs on the heatmap</h3>
+<p>A pair you mark as failed turns darkest red with a × on the heatmap, so it stands out from merely slow pairs. It returns to its normal colour once two clean single-pair recalls clear it from the missed-word list. Hover or tap the cell to see how many times it has been failed.</p>
 <h3>Missed-word review</h3>
 <p>Use a right-side fail key while a pair is active to add it to your missed-word list. In <b>Missed-Word Review</b> mode, only those pairs are shown. Two successful single-pair recalls in a row remove a pair from the list; failing it again resets that progress. Failed attempts never add a time to your stats.</p>
 <h3>Spaced repetition</h3>
 <p><b>Spaced Repetition</b> first introduces pairs you have not yet reviewed, then prioritises pairs that are due again. A fast recall is scheduled further into the future than a medium or slow recall. A failed pair becomes due immediately, so it returns to practice sooner without repeating on the very next draw.</p>
-<h3>Real Orozco corner memo</h3>
-<p><b>Real Orozco Corner Memo</b> generates a legal 20-move 3×3 scramble locally, simulates its corners, and traces a standard Speffz target stream from your C (UFR) buffer with B (UBR) as helper. When a new cycle is needed, it prefers G, then H, then the remaining available stickers. The result is split into your usual visual letter pairs and timed as one full corner memo attempt.</p>
-<p>If the corner target stream has an odd number of letters, the trainer marks <b>corner parity</b>. It preserves the final single target instead of inventing a fake pair, matching your plan to pseudo-swap during edge memo so B/C are swapped before you execute edges, corners, and your final J-perm. This is a memo trainer: it creates the trace and parity cue, but does not check execution.</p>
 <h3>Lookup and leaderboard</h3>
 <p>Press <kbd>[D]</kbd> or the Aa button to look up or edit any pair&rsquo;s word. The stats drawer shows your 10 slowest single pairs from the last 48 hours, with their words. The clock at the top left is your session time.</p>
 <h3>Multi-pair attempts</h3>
@@ -343,13 +424,13 @@ const L='ABCDEFGHIJKLMNOPQRSTUVWX'.split(''),ALL=L.join('');
 const KEY='bld-pairs-v1';
 const DEF={F:ALL,S:ALL,noId:false,flash:false,fd:.3,hideT:false,zen:false,n:1,thr:2,drill:false,pace:false,goal:3,acc:'#67E8F9',bg:'oled',tf:1,tm:2,gap:1.75,rm:'irl',snd:true,vol:.6};
 const ACC=['#67E8F9','#4ADE80','#FBBF24','#A78BFA'],ACCD=['#0E7490','#15803D','#B45309','#6D28D9'];
-let D={set:Object.assign({},DEF),words:{},stats:{},flag:{},streak:{},missed:{},missedStreak:{},review:{},hist:[]};
+let D={set:Object.assign({},DEF),words:{},stats:{},flag:{},streak:{},missed:{},missedStreak:{},review:{},fails:{},hist:[]};
 try{const r=JSON.parse(localStorage.getItem(KEY)||'null');if(r){D=Object.assign(D,r);D.set=Object.assign({},DEF,r.set)}}catch(e){}
-D.missed||={};D.missedStreak||={};D.review||={};
+D.missed||={};D.missedStreak||={};D.review||={};D.fails||={};if(D.set.rm==='scramble')D.set.rm='irl';
 const set=()=>D.set;
 function save(){try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}}
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const P=$('#pair'),T=$('#time'),W=$('#word'),WI=$('#wi'),PB=$('#pace'),PBI=PB.firstElementChild,SCR=$('#scramble');
+const P=$('#pair'),T=$('#time'),W=$('#word'),WI=$('#wi'),PB=$('#pace'),PBI=PB.firstElementChild;
 let st=0,cur=[],prev=null,t0=0,el=0,raf=0,ft=0,modal=null,sess={n:0,sum:0,best:null,rec:[],r:[0,0,0]};
 const FAIL_KEYS=new Set(['y','u','i','o','p','j','h','k','l','n','m','b',',','.',';','[',"'",'8','9','0','/',']','=','-']);
 const fmt=ms=>(ms/1000).toFixed(2)+'s';
@@ -364,7 +445,7 @@ function applyAcc(){
   $('#sclk').style.display=set().zen?'none':'block';
 }
 
-let deck=[],deckSig='',warned=false;
+let deck=[],deckSig='',warned=false,pickFail=0;
 function rnd(a){return a[Math.random()*a.length|0]}
 function activePool(){const s=set(),out=[];for(const a of s.F)for(const b of s.S){if(s.noId&&a===b)continue;out.push(a+b)}return out}
 function avgT(k){const t=D.stats[k];return t?(typeof t.ema==='number'?t.ema:t.s/t.n):0}
@@ -406,7 +487,7 @@ function pick(){
   }
   if(rm==='missed'){
     missed=missedSet(base);
-    if(!missed.length){toast('No missed-word pairs yet. Mark a pair failed first.');return null}
+    if(!missed.length){toast('No missed-word pairs yet. Mark a pair failed first.');pickFail=1;return null}
   }
   for(let i=0;i<n;i++){
     const avoid=i?out[i-1]:prev;let k;
@@ -417,36 +498,6 @@ function pick(){
   return out;
 }
 
-/* Local 3×3 corner simulator: standard Speffz, white top / green front. */
-const CORNER={
-  A:[-1,1,-1,0,1,0],B:[1,1,-1,0,1,0],C:[1,1,1,0,1,0],D:[-1,1,1,0,1,0],
-  E:[-1,1,-1,-1,0,0],F:[-1,1,1,-1,0,0],G:[-1,-1,1,-1,0,0],H:[-1,-1,-1,-1,0,0],
-  I:[-1,1,1,0,0,1],J:[1,1,1,0,0,1],K:[1,-1,1,0,0,1],L:[-1,-1,1,0,0,1],
-  M:[1,1,1,1,0,0],N:[1,1,-1,1,0,0],O:[1,-1,-1,1,0,0],P:[1,-1,1,1,0,0],
-  Q:[1,1,-1,0,0,-1],R:[-1,1,-1,0,0,-1],S:[-1,-1,-1,0,0,-1],T:[1,-1,-1,0,0,-1],
-  U:[-1,-1,1,0,-1,0],V:[1,-1,1,0,-1,0],W:[1,-1,-1,0,-1,0],X:[-1,-1,-1,0,-1,0]
-};
-const CORNER_AT={};
-for(const l of L){const r=CORNER[l];CORNER_AT[r.join(',')]=l}
-const TURN={U:['y',1,1],D:['y',-1,-1],R:['x',1,1],L:['x',-1,-1],F:['z',1,-1],B:['z',-1,1]};
-function rot(v,axis,dir){let[x,y,z]=v;if(axis==='x')return[x,dir>0?-z:z,dir>0?y:-y];if(axis==='y')return[dir>0?z:-z,y,dir>0?-x:x];return[dir>0?-y:y,dir>0?x:-x,z]}
-function turnCorners(state,face,amount){const [axis,layer,dir]=TURN[face];for(let step=0;step<amount;step++){const next={};for(const l of L){const r=CORNER[l],coord=r.slice(0,3),normal=r.slice(3);if(coord[['x','y','z'].indexOf(axis)]===layer){const target=CORNER_AT[rot(coord,axis,dir).concat(rot(normal,axis,dir)).join(',')];next[target]=state[l]}else next[l]=state[l]}state=next}return state}
-function makeScramble(){const faces=['U','D','R','L','F','B'],axis={U:'y',D:'y',R:'x',L:'x',F:'z',B:'z'},suffix=['',"'",'2'];let out=[],last='',lastAxis='';while(out.length<20){const f=rnd(faces);if(f===last||axis[f]===lastAxis)continue;out.push(f+rnd(suffix));last=f;lastAxis=axis[f]}return out}
-function cycle(state,start){const out=[],seen=new Set();let p=start;while(!seen.has(p)){seen.add(p);out.push(p);p=state[p]}return out}
-function traceOrozcoCorners(state){
-  const used=new Set(),memo=[],buffer='C',helper='B';
-  const take=(start,isBuffer=false)=>{const c=cycle(state,start);c.forEach(x=>used.add(x));if(isBuffer)memo.push(...c.slice(1));else{const ix=c.indexOf(start);memo.push(...c.slice(ix),...c.slice(0,ix));}};
-  const first=cycle(state,buffer);if(first.length>1)take(buffer,true);else used.add(buffer);
-  const priority=['G','H',...L.filter(x=>x!==buffer&&x!==helper&&x!=='G'&&x!=='H'),helper];
-  while(true){const start=priority.find(x=>!used.has(x)&&state[x]!==x);if(!start)break;take(start);}
-  return memo;
-}
-function cornerScrambleAttempt(){
-  const scramble=makeScramble();let state={};L.forEach(l=>state[l]=l);
-  scramble.forEach(m=>{const amount=m.endsWith('2')?2:1,face=m[0];state=turnCorners(state,face,amount);if(m.endsWith("'")){state=turnCorners(state,face,2)}});
-  const memo=traceOrozcoCorners(state),pairs=[];for(let i=0;i<memo.length;i+=2)pairs.push(memo.slice(i,i+2).join(''));
-  return {scramble:scramble.join(' '),pairs,parity:memo.length%2===1};
-}
 function showLive(){return !set().hideT&&!set().zen}
 function tick(){
   if(st!==1)return;
@@ -460,10 +511,8 @@ function setWord(t){W.textContent=t;W.classList.remove('pop');if(t){void W.offse
 function savedWords(){return cur.map(k=>D.words[k]).filter(Boolean).join('   ')}
 function start(){
   hideWI();
-  const real=set().rm==='scramble'?cornerScrambleAttempt():null;
-  const c=real?real.pairs:pick();
-  if(!c){snd('err');toast('No pairs selected. Open settings.');return}
-  SCR.innerHTML=real?'<b>Scramble</b> '+real.scramble+(real.parity?' &nbsp;·&nbsp; <b>Corner parity</b> — use your edge pseudo-swap / final J-perm plan':''):'';
+  const c=pick();
+  if(!c){snd('err');if(!pickFail)toast('No pairs selected. Open settings.');pickFail=0;return}
   cur=c;prev=c[c.length-1];
   P.className='run';P.style.setProperty('--n',c.length);
   P.innerHTML=c.map(k=>'<span>'+k+'</span>').join('');P.style.setProperty('--gap',set().gap+'rem');
@@ -499,7 +548,7 @@ function fail(){
   if(st!==1)return;
   st=2;cancelAnimationFrame(raf);clearTimeout(ft);
   P.classList.remove('hid','pulse','run');
-  const now=Date.now();cur.forEach(k=>{D.missed[k]=1;D.missedStreak[k]=0;D.review[k]={last:now,due:now,interval:0}});save();
+  const now=Date.now();if(cur.length===1)D.fails[cur[0]]=(D.fails[cur[0]]||0)+1;cur.forEach(k=>{D.missed[k]=1;D.missedStreak[k]=0;D.review[k]={last:now,due:now,interval:0}});save();
   T.textContent='Failed';T.className='failed';
   PB.style.visibility='hidden';
   setWord(savedWords());
@@ -510,7 +559,6 @@ function reset(){
   cancelAnimationFrame(raf);clearTimeout(ft);st=0;cur=[];hideWI();
   P.className='idle';P.style.removeProperty('--n');P.textContent='Press Spacebar to Start';
   T.textContent='';T.className='';W.textContent='';PB.style.visibility='hidden';
-  SCR.textContent='';
 }
 function press(){if(st===1)stop();else start()}
 function openWI(){
@@ -587,7 +635,7 @@ $('#bim').onclick=()=>{
   try{
     const raw=$('#dj').value.trim();if(raw[0]!=='{'){importCSV(raw);return}const r=JSON.parse(raw);
     const jl=[];for(const k in (r.words||{})){const w=String(r.words[k]).trim().toLowerCase();if(/^[A-Za-z]{2}$/.test(k)&&w){D.words[k.toUpperCase()]=w;jl.push([k.toUpperCase(),w])}}
-    if(r.stats)D.stats=r.stats;if(r.flag)D.flag=r.flag;if(r.missed)D.missed=r.missed;if(r.missedStreak)D.missedStreak=r.missedStreak;if(r.review)D.review=r.review;if(r.hist)D.hist=r.hist;
+    if(r.stats)D.stats=r.stats;if(r.flag)D.flag=r.flag;if(r.missed)D.missed=r.missed;if(r.fails)D.fails=r.fails;if(r.missedStreak)D.missedStreak=r.missedStreak;if(r.review)D.review=r.review;if(r.hist)D.hist=r.hist;
     if(r.set)D.set=Object.assign({},DEF,r.set);
     save();applyAcc();syncUI();importDone(jl);
   }catch(e){snd('err');toast('That JSON could not be read')}
@@ -666,9 +714,9 @@ $('#bcsv').onclick=()=>{$('#dj').value='pair,word\n'+Object.keys(D.words).sort()
 $('#bhelp').onclick=()=>openM('help');
 let pend=null;
 const ACT={
-  stats:{t:'Clear session history and heatmap?',p:'This permanently deletes heatmap data, average times, weak-pair flags, missed-word and spaced-repetition progress, attempt history and the session log. Your saved words, settings and theme stay as they are.',y:'Yes, clear stats',f:()=>{D.stats={};D.flag={};D.streak={};D.missed={};D.missedStreak={};D.review={};D.hist=[];sess={n:0,sum:0,best:null,rec:[],r:[0,0,0]};prev=null}},
+  stats:{t:'Clear session history and heatmap?',p:'This permanently deletes heatmap data, average times, weak-pair flags, missed-word and spaced-repetition progress, attempt history and the session log. Your saved words, settings and theme stay as they are.',y:'Yes, clear stats',f:()=>{D.stats={};D.flag={};D.streak={};D.missed={};D.missedStreak={};D.review={};D.fails={};D.hist=[];sess={n:0,sum:0,best:null,rec:[],r:[0,0,0]};prev=null}},
   words:{t:'Clear the word dictionary?',p:'This permanently deletes every saved mnemonic word. Your stats, settings and theme stay as they are.',y:'Yes, clear words',f:()=>{D.words={}}},
-  all:{t:'Factory reset?',p:'This permanently wipes all words, heatmap data, session stats, custom settings and theme choices, and restores every default.',y:'Yes, reset everything',f:()=>{D={set:Object.assign({},DEF),words:{},stats:{},flag:{},streak:{},missed:{},missedStreak:{},review:{},hist:[]};sess={n:0,sum:0,best:null,rec:[],r:[0,0,0]};prev=null}}
+  all:{t:'Factory reset?',p:'This permanently wipes all words, heatmap data, session stats, custom settings and theme choices, and restores every default.',y:'Yes, reset everything',f:()=>{D={set:Object.assign({},DEF),words:{},stats:{},flag:{},streak:{},missed:{},missedStreak:{},review:{},fails:{},hist:[]};sess={n:0,sum:0,best:null,rec:[],r:[0,0,0]};prev=null}}
 };
 function ask(k){pend=k;const a=ACT[k];$('#ct').textContent=a.t;$('#cp').textContent=a.p;$('#cyes').textContent=a.y;openM('confirm')}
 $('#bc1').onclick=()=>ask('stats');
@@ -702,6 +750,13 @@ function snd(n,dl){
     case 'stop':tn(392,t,.45,'sine',.22);tn(587.33,t+.02,.4,'sine',.12);tn(196,t,.5,'sine',.1);break;
     case 'open':tn(640,t,.05,'triangle',.10,950);tn(1120,t+.035,.06,'sine',.06);break;
     case 'close':tn(860,t,.05,'triangle',.09,520);tn(420,t+.03,.07,'sine',.05);break;
+    case 'intro':
+      for(let d=0;d<5;d++)tn(440*Math.pow(2,[0,2,4,7,9][d]/12),t+.15+d*.08,.24,'sine',.09);
+      tn(110,t+.1,1.1,'sine',.07);
+      tn(180,t+1.2,.6,'sine',.1,1100);
+      for(let i=0;i<4;i++)tn(660+i*110,t+1.6+i*.09,.14,'triangle',.06);
+      [392,523.25,659.25,783.99].forEach(f=>tn(f,t+1.95,1.2,'sine',.09));
+      tn(1568,t+2.25,.3,'sine',.04);tn(2093,t+2.35,.35,'sine',.035);break;
     case 'click':tn(900,t,.025,'triangle',.12,500);break;
     case 'toggle':tn(720,t,.035,'triangle',.09,980);break;
     case 'select':tn(1050,t,.035,'sine',.07,780);break;
@@ -727,16 +782,17 @@ function renderHeat(){
   const hc=['#1E8E4E','#B8941F','#B94646'];
   for(const a of L){h+='<div>'+a+'</div>';
     for(const b of L){const k=a+b,t=D.stats[k];
+      if(D.missed[k]&&D.fails[k]){h+='<div data-p="'+k+'" style="background:#5A0B14;color:#FCA5A5">×</div>';continue}
       if(!t){h+='<div data-p="'+k+'" style="background:var(--line)"></div>';continue}
       h+='<div data-p="'+k+'" style="background:'+hc[rate(avgT(k))]+'"></div>';}}
   g.innerHTML=h;
   $('#hmi').textContent='Hover or tap a cell for details. Recent attempts count most.';
-  $('#hl').innerHTML='<span style="color:#4ADE80">Fast under '+set().tf+'s</span>, <span style="color:#FBBF24">medium up to '+set().tm+'s</span>, <span style="color:#F87171">slow above that</span>. The heatmap uses a weighted recent average, so it follows your improvement.';
+  $('#hl').innerHTML='<span style="color:#4ADE80">Fast under '+set().tf+'s</span>, <span style="color:#FBBF24">medium up to '+set().tm+'s</span>, <span style="color:#F87171">slow above that</span>, <span style="color:#FCA5A5;background:#5A0B14;padding:0 .35em;border-radius:3px">× darkest red</span> failed (clears after two clean recalls). The heatmap uses a weighted recent average, so it follows your improvement.';
 }
 function hmInfo(e){
   const p=e.target.dataset&&e.target.dataset.p;if(!p)return;
   const t=D.stats[p],w=D.words[p];
-  $('#hmi').textContent=p+(w?'  '+String(w).toLowerCase():'')+'  '+(t?(avgT(p)/1000).toFixed(2)+'s recent-weighted average over '+t.n+' attempt'+(t.n>1?'s':''):'no data yet');
+  $('#hmi').textContent=p+(w?'  '+String(w).toLowerCase():'')+'  '+(t?(avgT(p)/1000).toFixed(2)+'s recent-weighted average over '+t.n+' attempt'+(t.n>1?'s':''):'no time data yet')+(D.fails[p]?'  failed '+D.fails[p]+(D.fails[p]>1?' times':' time')+(D.missed[p]?' (still in missed list)':''):'');
 }
 $('#hm').addEventListener('mouseover',hmInfo);
 $('#hm').addEventListener('click',hmInfo);
@@ -808,11 +864,37 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')hideTip()},true);
 
 /* session clock */
 const S0=Date.now(),SC=$('#sclk');
+SC.addEventListener('click',()=>setTimeout(()=>SC.blur(),0));
 function clk(){
   const q=Math.floor((Date.now()-S0)/1000),h=q/3600|0,m=(q%3600)/60|0,x=q%60,p=n=>String(n).padStart(2,'0');
   SC.textContent=(h?h+':'+p(m):m)+':'+p(x);
 }
 clk();setInterval(clk,1000);
+
+/* intro + heatmap ripple */
+(function(){
+  let el=document.getElementById('intro'),done=false,locked=false,tm=0;
+  function go(){if(done)return;done=true;clearTimeout(tm);document.body.classList.add('ready');if(el){const e=el;e.classList.add('out');setTimeout(()=>e.remove(),700)}}
+  if(!el){document.body.classList.add('ready');return}
+  tm=setTimeout(go,3900);
+  if(set().snd&&!matchMedia('(prefers-reduced-motion: reduce)').matches){
+    const a=actx();
+    if(a&&a.state==='running')snd('intro');
+    else{locked=true;const h=document.createElement('div');h.className='ihint';h.textContent='Tap or press any key for sound';el.appendChild(h)}
+  }
+  function gesture(){
+    if(done)return;
+    if(locked){
+      locked=false;clearTimeout(tm);const a=actx();
+      if(!a){go();return}
+      a.resume().then(()=>{const n=el.cloneNode(true),h=n.querySelector('.ihint');if(h)h.remove();n.classList.remove('out');el.replaceWith(n);el=n;snd('intro');tm=setTimeout(go,3900)}).catch(go);
+      return;
+    }
+    go();
+  }
+  ['keydown','pointerdown'].forEach(ev=>addEventListener(ev,gesture));
+})();
+$('#bh').addEventListener('click',()=>{$$('#hm div').forEach((d,i)=>{d.style.animationDelay=((i%25)+((i/25)|0))*12+'ms'})});
 applyAcc();
 })();
 </script>
