@@ -35,9 +35,14 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 #time.failed{color:var(--r);letter-spacing:.12em;text-transform:uppercase}
 #word{color:var(--fg);font-size:clamp(1.1rem,3.6vw,1.8rem);min-height:1.5em;letter-spacing:.08em}
 #time.r0{color:#4ADE80}#time.r1{color:#FBBF24}#time.r2{color:#F87171}
-#pace{width:min(420px,60vw);height:3px;background:var(--line);border-radius:2px;overflow:hidden;visibility:hidden}
-#pace i{display:block;height:100%;background:var(--acc);transform-origin:left;transform:scaleX(0)}
-#pace.over i{background:#FBBF24}
+#pace{width:min(420px,60vw);height:3px;background:color-mix(in srgb,var(--line) 84%,transparent);border-radius:999px;overflow:hidden;visibility:hidden;position:relative;isolation:isolate;box-shadow:0 0 0 1px color-mix(in srgb,var(--line) 20%,transparent);transition:opacity .28s ease,box-shadow .35s ease}
+#pace i{display:block;height:100%;width:100%;background:linear-gradient(90deg,color-mix(in srgb,var(--acc) 68%,transparent),var(--acc) 65%,color-mix(in srgb,var(--acc) 78%,white));transform-origin:left;transform:scaleX(0);transition:background .3s ease,filter .3s ease;position:relative;border-radius:inherit;will-change:transform}
+#pace i::after{content:"";position:absolute;inset:0;width:34%;left:-35%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);opacity:.7;animation:paceSheen 2.4s ease-in-out infinite;pointer-events:none}
+#pace.over{box-shadow:0 0 8px color-mix(in srgb,#FBBF24 24%,transparent)}#pace.over i{background:linear-gradient(90deg,#FBBF24,#F59E0B);filter:saturate(1.08)}
+@keyframes paceSheen{0%,25%{left:-35%;opacity:0}45%{opacity:.7}75%,100%{left:110%;opacity:0}}
+.zen-uncheck{animation:zenUntoggle .42s cubic-bezier(.2,.75,.25,1) both;transform-origin:center}
+@keyframes zenUntoggle{0%{opacity:1;transform:translateX(0);background:color-mix(in srgb,var(--acc) 12%,var(--panel))}55%{opacity:.72;transform:translateX(5px)}100%{opacity:1;transform:translateX(0);background:transparent}}
+@media(prefers-reduced-motion:reduce){#pace i::after{animation:none}.zen-uncheck{animation:none!important}#pace,#pace i{transition:none!important}}
 #wrap{min-height:2.6rem}
 #wi{display:none;width:min(440px,86vw);background:var(--panel);border:1px solid var(--acc);border-radius:6px;padding:.6em .8em;text-align:center;user-select:text;-webkit-user-select:text}
 #guide{position:fixed;bottom:0;left:0;right:0;text-align:center;padding:.8rem calc(.8rem) calc(.8rem + env(safe-area-inset-bottom,0px));font-size:.75rem;color:var(--muted);transition:opacity 1s;pointer-events:none}
@@ -302,7 +307,6 @@ input:focus,select:focus,textarea:focus{border-color:var(--acc);box-shadow:0 0 0
 <div class="it"><span class="lb">Randomisation mode<i class="inf" tabindex="0" data-tip="Choose true-random practice or review pairs that are untested, slow, or failed.">i</i></span>
 <select data-k="rm"><option value="irl">3BLD IRL (True Random)</option><option value="review">Slow / Failed / Untested Review</option></select></div>
 <div class="it"><span class="lb">Pairs per attempt</span><select data-k="n"><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
-<div class="it"><span class="lb">Spacing between pairs</span><span class="ctl"><input type="number" min="0.5" max="4" step="0.25" data-k="gap"><span class="mut">rem</span></span></div>
 <label class="it"><span class="lb">Exclude identical pairs<i class="inf" tabindex="0" data-tip="Skips AA, BB, CC and the other doubled pairs.">i</i></span><input type="checkbox" class="tg" data-k="noId"></label>
 </div>
 <div class="grp poolgrp">
@@ -344,7 +348,9 @@ input:focus,select:focus,textarea:focus{border-color:var(--acc);box-shadow:0 0 0
 
 <div class="sec">Visuals &amp; Themes</div>
 <div class="grp">
+<label class="it"><span class="lb">Show streak</span><input type="checkbox" class="tg" data-k="showStreak"></label>
 <div class="it"><span class="lb">Theme</span><select data-k="bg"><optgroup label="Dark"><option value="oled">OLED pure black</option><option value="solid">Solid dark navy</option><option value="aurora">Dark aurora</option><option value="forest">Deep forest</option><option value="ocean">Midnight ocean</option><option value="ember">Dark ember</option><option value="rose">Midnight rose</option></optgroup><optgroup label="Light"><option value="sunset">Warm sunset</option><option value="sage">Nature and sage</option><option value="meadow">Spring meadow</option><option value="lagoon">Coastal lagoon</option><option value="lavender">Lavender field</option><option value="light">Modern light minimal</option></optgroup></select></div>
+<div class="it"><span class="lb">Spacing between pairs</span><span class="ctl"><input type="number" min="0.5" max="4" step="0.25" data-k="gap"><span class="mut">rem</span></span></div>
 </div>
 <div class="fn">Accent colours follow the theme. All themes except OLED, Solid navy and Modern light have a slow animated background.</div>
 
@@ -434,11 +440,13 @@ C,cat,cabin,cucumber</pre>
 (function(){
 const L='ABCDEFGHIJKLMNOPQRSTUVWX'.split(''),ALL=L.join('');
 const KEY='bld-pairs-v1';
-const DEF={F:ALL,S:ALL,noId:false,flash:false,fd:.3,hideT:false,zen:false,n:1,thr:2,drill:false,pace:false,goal:3,acc:'#67E8F9',bg:'sage',tf:1,tm:2,gap:1.75,rm:'irl',snd:true,vol:.6};
+const DEF={F:ALL,S:ALL,noId:false,flash:false,fd:.3,hideT:false,zen:false,n:1,thr:2,drill:false,pace:false,goal:1,acc:'#67E8F9',bg:'sage',tf:1,tm:2,gap:1.75,rm:'irl',snd:true,vol:.6,showStreak:false};
 const ACC=['#67E8F9','#4ADE80','#FBBF24','#A78BFA'],ACCD=['#0E7490','#15803D','#B45309','#6D28D9'];
 let D={set:Object.assign({},DEF),words:{},stats:{},flag:{},streak:{},missed:{},missedStreak:{},review:{},fails:{},hist:[]};
 try{const r=JSON.parse(localStorage.getItem(KEY)||'null');if(r){D=Object.assign(D,r);D.set=Object.assign({},DEF,r.set)}}catch(e){}
-D.missed||={};D.missedStreak||={};D.review||={};D.fails||={};D.greenStreak=Number.isFinite(D.greenStreak)?D.greenStreak:0;if(D.set.bg==='oled')D.set.bg='sage';if(!['irl','review'].includes(D.set.rm))D.set.rm='irl';
+D.missed||={};D.missedStreak||={};D.review||={};D.fails||={};D.greenStreak=Number.isFinite(D.greenStreak)?D.greenStreak:0;if(D.set.goal===3)D.set.goal=1;if(D.set.bg==='oled')D.set.bg='sage';if(!['irl','review'].includes(D.set.rm))D.set.rm='irl';
+// One-time migration: start with a neutral timer/pacing setup, then preserve the user's choices.
+if(!D.set.timerDefaultsV){D.set.zen=false;D.set.pace=false;D.set.hideT=false;D.set.flash=false;D.set.timerDefaultsV=1;}
 const set=()=>D.set;
 function save(){try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){}}
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
@@ -457,6 +465,7 @@ function applyAcc(){
   r.style.removeProperty('--acc');
   r.dataset.bg=b;r.dataset.lt=lt?'1':'0';r.dataset.anim=NOANIM.includes(b)?'0':'1';
   $('#sclk').style.display=set().zen?'none':'block';
+  $('#streak').style.display=set().showStreak?'flex':'none';
 }
 
 let deck=[],deckSig='',warned=false,pickFail=0;
@@ -659,10 +668,18 @@ $('#ps').onclick=()=>{set().F=$('#pl').value;set().S=ALL;poolUpdate()};
 $('#pe').onclick=()=>{set().S=$('#pl').value;set().F=ALL;poolUpdate()};
 let lastSliderSound=0;
 function sliderSound(){const now=performance.now();if(now-lastSliderSound<55)return;lastSliderSound=now;snd('slider')}
+function zenUntoggle(k){
+  const input=$('[data-k="'+k+'"]');if(!input)return;
+  const row=input.closest('.it');if(row){row.classList.remove('zen-uncheck');void row.offsetWidth;row.classList.add('zen-uncheck');row.addEventListener('animationend',()=>row.classList.remove('zen-uncheck'),{once:true})}
+  input.checked=false;set()[k]=false;
+}
 $$('[data-k]').forEach(i=>i.addEventListener('input',()=>{
   const k=i.dataset.k;let v=i.type==='checkbox'?i.checked:i.value;
   if(i.type==='range'||i.type==='number'||k==='n'){v=parseFloat(v);if(isNaN(v))return}
-  set()[k]=v;if(k==='fd')$('#fdv').textContent=v.toFixed(2)+'s';if(i.type==='range')sliderSound();save();applyAcc();
+  set()[k]=v;
+  if(k==='zen'&&v){['pace','hideT','flash'].forEach(zenUntoggle)}
+  else if(v&&['pace','hideT','flash'].includes(k)){zenUntoggle('zen')}
+  if(k==='fd')$('#fdv').textContent=v.toFixed(2)+'s';if(i.type==='range')sliderSound();save();applyAcc();syncUI();
 }));
 $$('[data-k]').forEach(i=>i.addEventListener('change',()=>{if(i.dataset.k!=='vol'&&i.type!=='range')snd(i.type==='checkbox'?'toggle':'select')}));
 $('#bex').onclick=()=>{$('#dj').value=JSON.stringify(D)};
