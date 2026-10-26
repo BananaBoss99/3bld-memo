@@ -1651,7 +1651,7 @@ tmEl.addEventListener('pointerup',e=>{if(e.target.closest('.tclose,.tcube'))retu
 tmEl.addEventListener('pointercancel',()=>{if(TM.s==='hold'||TM.s==='ready'){clearTimeout(TM.holdTimer);TM.s=TM.prev;tmClass(TM.prev==='stop'?'stop':'');tmHint(TM_HINT)}});
 $('#bt').onclick=openTimer;
 /* ---------- 3D scramble cube (drag to rotate) ---------- */
-const TC={rx:-26,ry:-38,vx:0,vy:0,drag:false,lx:0,ly:0,raf:0};
+const TC={rx:-26,ry:-38,vx:0,vy:0,drag:false,lx:0,ly:0,raf:0,applyRaf:0,faces:[]};
 const TC_COL={U:'#F5F5F0',R:'#D63A3A',F:'#2FA84F',D:'#F5C518',L:'#F08A24',B:'#2F6FDB'},TC_FACE=['u','r','f','d','l','b'];
 const tcClamp=v=>Math.max(-88,Math.min(88,v));
 const TC_N={u:[0,-1,0],r:[1,0,0],f:[0,0,1],d:[0,1,0],l:[-1,0,0],b:[0,0,-1]};
@@ -1666,9 +1666,11 @@ function tcRot(v){
 }
 function tcApply(){
   const el=$('#tc3d');el.style.transform='rotateX('+TC.rx+'deg) rotateY('+TC.ry+'deg)';
+  /* Cache face nodes after each scramble render; querying the subtree on every drag frame
+     forces extra main-thread work and can make rotation feel sticky. */
   /* live UV gloss: light stays fixed, highlights slide across the faces as the cube turns */
-  el.querySelectorAll('.tf').forEach(f=>{
-    const k=f.className.slice(-1),n=tcRot(TC_N[k]),u=tcRot(TC_UV[k][0]),v=tcRot(TC_UV[k][1]);
+  TC.faces.forEach(({f,k})=>{
+    const n=tcRot(TC_N[k]),u=tcRot(TC_UV[k][0]),v=tcRot(TC_UV[k][1]);
     const diff=Math.max(0,tcDot(n,TC_L)),spec=Math.pow(Math.max(0,tcDot(n,TC_H)),9);
     f.style.setProperty('--gi',(.06+.3*spec).toFixed(3));
     f.style.setProperty('--gd',(.2*(1-diff)).toFixed(3));
@@ -1684,7 +1686,9 @@ function tcRender(){
     h+='</div>';
   }
   h+='<div class="tcore"><b></b><b></b><b></b><b></b><b></b><b></b></div>';
-  $('#tc3d').innerHTML=h;tcApply();
+  const cube=$('#tc3d');cube.innerHTML=h;
+  TC.faces=Array.from(cube.querySelectorAll('.tf'),f=>({f,k:f.className.slice(-1)}));
+  tcApply();
 }
 const tcEl=$('#tcube');
 tcEl.addEventListener('pointerdown',e=>{
@@ -1696,16 +1700,24 @@ tcEl.addEventListener('pointerdown',e=>{
 tcEl.addEventListener('pointermove',e=>{
   if(!TC.drag)return;
   const dx=e.clientX-TC.lx,dy=e.clientY-TC.ly;TC.lx=e.clientX;TC.ly=e.clientY;
-  TC.ry+=dx*.55;TC.rx=tcClamp(TC.rx-dy*.55);TC.vx=dx*.55;TC.vy=-dy*.55;tcApply();
+  TC.ry+=dx*.55;TC.rx=tcClamp(TC.rx-dy*.55);TC.vx=dx*.55;TC.vy=-dy*.55;
+  /* Coalesce high-frequency pointer events to one visual update per display frame. */
+  if(!TC.applyRaf)TC.applyRaf=requestAnimationFrame(()=>{TC.applyRaf=0;tcApply()});
 });
 function tcEnd(){
   if(!TC.drag)return;TC.drag=false;tcEl.classList.remove('drag');
-  (function step(){TC.ry+=TC.vx;TC.rx=tcClamp(TC.rx+TC.vy);TC.vx*=.93;TC.vy*=.93;tcApply();
-    if(Math.abs(TC.vx)+Math.abs(TC.vy)>.05)TC.raf=requestAnimationFrame(step)})();
+  if(TC.applyRaf){cancelAnimationFrame(TC.applyRaf);TC.applyRaf=0;tcApply()}
+  let last=0;
+  (function step(now){
+    if(!last)last=now;const dt=Math.min(32,now-last);last=now;
+    const frame=dt/(1000/60);TC.ry+=TC.vx*frame;TC.rx=tcClamp(TC.rx+TC.vy*frame);
+    const decay=Math.pow(.93,frame);TC.vx*=decay;TC.vy*=decay;tcApply();
+    if(Math.abs(TC.vx)+Math.abs(TC.vy)>.05)TC.raf=requestAnimationFrame(step);else TC.raf=0;
+  })(performance.now());
 }
 tcEl.addEventListener('pointerup',tcEnd);tcEl.addEventListener('pointercancel',tcEnd);
 tcEl.addEventListener('dblclick',()=>{
-  cancelAnimationFrame(TC.raf);
+  cancelAnimationFrame(TC.raf);cancelAnimationFrame(TC.applyRaf);TC.applyRaf=0;
   TC.ry=((TC.ry%360)+540)%360-180;TC.ry+=((-38-TC.ry+540)%360)-180;TC.rx=-26;
   const el=$('#tc3d');el.style.transition='transform .6s cubic-bezier(.32,.72,0,1)';tcApply();
   setTimeout(()=>{el.style.transition=''},650);
