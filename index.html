@@ -399,6 +399,52 @@ body.ready #top button:nth-child(5){animation-delay:.33s}
 
 #hm .hmhl{cursor:pointer;color:var(--fg);transition:transform .18s cubic-bezier(.34,1.56,.64,1),color .15s}
 #hm .hmhl:hover{color:var(--acc);transform:scale(1.4);font-weight:700}
+
+/* ---------- timer page ---------- */
+#timer{padding:0;background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.tclose{position:absolute;top:calc(env(safe-area-inset-top,0px) + 1rem);right:1rem;z-index:2;border-radius:999px;padding:.45em 1.1em;font-size:.85rem;color:var(--muted);background:color-mix(in srgb,var(--panel) 70%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.tclose:hover{color:var(--acc)}
+.tpage{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;padding:clamp(4.2rem,15vh,8.5rem) 1.5rem 3rem}
+#timer.on .tpage{animation:tpin .6s cubic-bezier(.32,.72,0,1) backwards}
+@keyframes tpin{from{opacity:0;transform:translateY(18px) scale(.985)}}
+.tmsc{display:flex;flex-wrap:wrap;justify-content:center;gap:.8rem 1.6rem;max-width:min(1100px,100%);line-height:1.15}
+.tmsc span{font-size:clamp(1.7rem,4.6vw,2.9rem);font-weight:600;letter-spacing:.03em;animation:mv .45s cubic-bezier(.32,.72,0,1) backwards;animation-delay:calc(var(--i) * 20ms)}
+.tmsc small{font-size:.72em;margin-left:.06em;color:var(--acc);font-weight:600}
+@keyframes mv{from{opacity:0;transform:translateY(10px)}}
+.tmmain{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%}
+.tmt{font-size:clamp(4.6rem,21vw,12rem);font-weight:600;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:.015em;transition:color .15s}
+.tmline{width:min(380px,62vw);height:3px;border-radius:2px;background:var(--line);overflow:hidden;margin-top:1.6rem}
+#tmbar{display:block;height:100%;width:0;background:var(--r);transition:width .3s linear,background-color .15s,opacity .3s}
+.tpage.hold #tmbar{width:100%}
+.tpage.ready #tmbar{width:100%;background:var(--g)}
+.tpage.run #tmbar{width:100%;background:var(--acc);opacity:.3}
+.tpage.stop #tmbar{width:100%;background:var(--acc);opacity:.6}
+.tpage.hold .tmt{color:var(--r)}.tpage.ready .tmt{color:var(--g)}.tpage.stop .tmt{color:var(--acc)}
+.tmh{color:var(--muted);font-size:.85rem;margin-top:1rem;min-height:1.3em;letter-spacing:.03em}
+#top #bt:hover{transform:rotate(12deg) scale(1.2)}
+@media (hover:none){#top #bt:hover{transform:none}}
+#bt{display:inline-flex;align-items:center;justify-content:center}
+#bt svg{width:1.2em;height:1.2em;display:block}
+body.ready #top button:nth-child(6){animation-delay:.4s}
+
+.tpage{position:relative;z-index:1}
+.tmsc small.pr{font-size:1.1em;font-weight:700;margin-left:.03em;line-height:0;position:relative;top:.05em}
+.tmsc small.dbl{font-size:.82em;font-weight:700;margin-left:.1em;position:relative;top:-.3em}
+.tbg{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.tbg i{position:absolute;border-radius:50%;filter:blur(70px);opacity:.38;will-change:transform}
+html[data-lt="1"] .tbg i{opacity:.5}
+.tbg i:nth-child(1){width:60vmax;height:60vmax;left:-15vmax;top:-22vmax;background:var(--b1,var(--acc));animation:tb1 26s ease-in-out infinite alternate}
+.tbg i:nth-child(2){width:55vmax;height:55vmax;right:-18vmax;top:8vh;background:var(--b2,#7C6CF0);animation:tb2 32s ease-in-out infinite alternate}
+.tbg i:nth-child(3){width:50vmax;height:50vmax;left:18vw;bottom:-30vmax;background:var(--b3,#2DD4BF);animation:tb3 38s ease-in-out infinite alternate}
+@keyframes tb1{to{transform:translate(18vmax,14vmax) scale(1.15)}}
+@keyframes tb2{to{transform:translate(-16vmax,10vmax) scale(.9)}}
+@keyframes tb3{to{transform:translate(12vmax,-14vmax) scale(1.2)}}
+.tgrid{position:absolute;left:-50%;width:200%;bottom:-4%;height:58%;transform-origin:50% 100%;transform:perspective(520px) rotateX(62deg);background-image:linear-gradient(color-mix(in srgb,var(--acc) 30%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--acc) 30%,transparent) 1px,transparent 1px);background-size:64px 64px;animation:tgmove 6s linear infinite;-webkit-mask-image:linear-gradient(to top,#000 0,transparent 80%);mask-image:linear-gradient(to top,#000 0,transparent 80%)}
+@keyframes tgmove{to{background-position:0 64px}}
+.tdots b{position:absolute;bottom:-40px;border-radius:4px;opacity:0;animation:tfl linear infinite}
+@keyframes tfl{0%{opacity:0;transform:translateY(0) rotate(0)}10%{opacity:var(--o)}85%{opacity:var(--o)}100%{opacity:0;transform:translateY(-115vh) rotate(220deg)}}
+.tbg::after{content:"";position:absolute;inset:0;background:radial-gradient(70% 60% at 50% 45%,transparent 38%,color-mix(in srgb,var(--bg) 72%,transparent) 100%)}
+@media (prefers-reduced-motion:reduce){.tbg i,.tgrid,.tdots b{animation:none!important}}
 </style>
 </head>
 <body>
@@ -413,6 +459,7 @@ body.ready #top button:nth-child(5){animation-delay:.33s}
 <div id="top">
 <button id="bd" tabindex="-1" aria-label="Word lookup" title="Word lookup [D]">Aa</button>
 <button id="bch" tabindex="-1" aria-label="Memo chain" title="Memo chain [C]"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
+<button id="bt" tabindex="-1" aria-label="Timer" title="Timer [T]"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2"/><path d="M9.5 2h5"/></svg></button>
 <button id="bh" tabindex="-1" aria-label="Heatmap" title="Heatmap">▦</button>
 <button id="bs" tabindex="-1" aria-label="Session stats" title="Session stats">≡</button>
 <button id="bg" tabindex="-1" aria-label="Settings" title="Settings">⚙</button>
@@ -532,7 +579,7 @@ C,cat,cabin,cucumber</pre>
 <h3>Where words appear</h3>
 <p>Saved words automatically appear directly below the timer and pair as soon as you stop the timer. In batch mode, each pair’s word shows in order.</p>
 <h3>Keyboard shortcuts</h3>
-<ul><li><kbd>[Space]</kbd> Start or stop the timer; after stopping, press it again to load the next pair</li><li><kbd>[\]</kbd> Undo the most recent stopped time and mark that pair as failed</li><li><kbd>[Esc]</kbd> or <kbd>[R]</kbd> Reset: cancel the current run</li><li><kbd>[Tab]</kbd> Edit Word after stopping, then <kbd>[Enter]</kbd> to save</li><li><kbd>[C]</kbd> Memo chain: memorise a longer chain of pairs, then recall it</li><li><kbd>[D]</kbd> Lookup: find or edit any pair&rsquo;s word</li><li><kbd>[Y U I O P J H K L N M B]</kbd>, punctuation keys, or <kbd>[8 9 0]</kbd>: mark an active attempt as failed without logging a time</li></ul>
+<ul><li><kbd>[Space]</kbd> Start or stop the timer; after stopping, press it again to load the next pair</li><li><kbd>[\]</kbd> Undo the most recent stopped time and mark that pair as failed</li><li><kbd>[Esc]</kbd> or <kbd>[R]</kbd> Reset: cancel the current run</li><li><kbd>[Tab]</kbd> Edit Word after stopping, then <kbd>[Enter]</kbd> to save</li><li><kbd>[T]</kbd> Timer: a calm scramble and timer page</li><li><kbd>[C]</kbd> Memo chain: memorise a longer chain of pairs, then recall it</li><li><kbd>[D]</kbd> Lookup: find or edit any pair&rsquo;s word</li><li><kbd>[Y U I O P J H K L N M B]</kbd>, punctuation keys, or <kbd>[8 9 0]</kbd>: mark an active attempt as failed without logging a time</li></ul>
 <h3>Randomisation modes</h3>
 <ul><li><b>3BLD IRL (True Random)</b>: draws randomly from your active letter-pair pool. The same pair never appears twice in a row.</li><li><b>Slow / Failed / Untested Review</b>: prioritises pairs with no recorded single-pair time, yellow or red recall times, or a failed attempt. Untested pairs stay here until tested. A green result removes a pair from this review pool; yellow, red, and failed pairs remain available for more practice. Green pairs are still available in True Random.</li></ul>
 <h3>Heatmap that follows improvement</h3>
@@ -543,6 +590,8 @@ C,cat,cabin,cucumber</pre>
 <p>In the stats drawer, Drill these starts a session on exactly your slowest pairs from the last 48 hours. Tap the Drilling chip under the timer to end it and see a recap of how each pair compares with before. Drill attempts count in your stats and heatmap like normal.</p>
 <h3>Drill a letter from the heatmap</h3>
 <p>Click any row letter (first letter) or column letter (second letter) on the heatmap to start drilling every pair that starts or ends with it straight away. Tap a row or column average cell to get a Drill button instead. The Drilling chip under the timer ends it and shows a recap.</p>
+<h3>Timer</h3>
+<p>Press <kbd>[T]</kbd> or the stopwatch button for a calm, full-screen scramble and timer. Hold Space (or press and hold anywhere on a phone) until the line turns green, release to start, and press to stop. A fresh random-state scramble appears after every solve; press <kbd>[N]</kbd> for a new one at any time. It keeps no history on purpose; use csTimer when you want stats.</p>
 <h3>Memo chains</h3>
 <p>Press <kbd>[C]</kbd> or the Ch button. Memorise 4 to 10 pairs in order, press Space, then type them back. Results show which positions you got right, with your saved words. Memo chains are stored separately and never change your heatmap, times, streak or stats.</p>
 <h3>Failed pairs on the heatmap</h3>
@@ -565,6 +614,15 @@ C,cat,cabin,cucumber</pre>
 <div id="impp" class="mut"></div>
 <div class="row" style="margin-top:1rem"><button data-close>Done</button></div>
 </div></div>
+
+<div class="ov" id="timer" role="dialog" aria-label="Timer">
+<div class="tbg" aria-hidden="true"><i></i><i></i><i></i><div class="tgrid"></div><div class="tdots"></div></div>
+<button class="tclose" data-close type="button" aria-label="Close timer">Close</button>
+<div class="tpage" id="tpage">
+<div id="tmsc" class="tmsc"></div>
+<div class="tmmain"><div id="tmt" class="tmt">0.00</div><div class="tmline"><i id="tmbar"></i></div><div id="tmh" class="tmh"></div></div>
+</div>
+</div>
 
 <div class="ov" id="chain"><div class="box" role="dialog" aria-label="Memo chain" style="width:min(640px,100%)">
 <h2>Memo chain <button data-close>Close</button></h2>
@@ -774,7 +832,7 @@ function saveWI(){
 
 addEventListener('keydown',e=>{
   if(introLock)return;
-  if(modal){if(e.key==='Escape')closeM();return}
+  if(modal){if(e.key==='Escape'){if(modal==='timer'&&tmEsc())return;closeM()}return}
   if(e.target===WI){
     if(e.key==='Enter'){e.preventDefault();saveWI()}
     else if(e.key==='Escape'){e.preventDefault();hideWI();WI.blur()}
@@ -791,6 +849,7 @@ addEventListener('keydown',e=>{
   if(st===1&&FAIL_KEYS.has(e.key.toLowerCase())){e.preventDefault();fail();return}
   if((e.key==='d'||e.key==='D')&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();openLookup();return}
   if((e.key==='c'||e.key==='C')&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();openChain();return}
+  if((e.key==='t'||e.key==='T')&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();openTimer();return}
   if(e.key==='Escape'||e.key==='r'||e.key==='R'){e.preventDefault();if(st!==0)snd('err');reset();return}
   if(e.key==='Tab'){e.preventDefault();if(st===2)openWI();}
 });
@@ -800,7 +859,7 @@ $$('#top button').forEach(b=>b.addEventListener('mousedown',e=>e.preventDefault(
 
 /* modals */
 function openM(id){reset();if(id!=='lookup')snd('open');if(modal)$('#'+modal).classList.remove('on','out');modal=id;const o=$('#'+id);o.classList.remove('out');o.classList.add('on');if(document.activeElement)document.activeElement.blur()}
-function closeM(){if(!modal)return;snd('close');tlStop();cancelAnimationFrame(chRaf);const o=$('#'+modal);modal=null;o.classList.remove('on');o.classList.add('out');setTimeout(()=>o.classList.remove('out'),230);if(document.activeElement)document.activeElement.blur()}
+function closeM(){if(!modal)return;snd('close');tlStop();cancelAnimationFrame(chRaf);if(modal==='timer')tmCancel();const o=$('#'+modal);modal=null;o.classList.remove('on');o.classList.add('out');setTimeout(()=>o.classList.remove('out'),230);if(document.activeElement)document.activeElement.blur()}
 $$('[data-close]').forEach(b=>b.addEventListener('click',closeM));
 $$('.ov').forEach(o=>o.addEventListener('mousedown',e=>{if(e.target===o)closeM()}));
 $('#bg').onclick=()=>{syncUI();openM('settings')};
@@ -986,6 +1045,8 @@ function cb(t,v,p){p=p||1;nz(t,.018,2400*p,2.2,.38*v);tn(620*p,t,.035,'triangle'
 const VOICES={
   soft:(n,t)=>{switch(n){
     case 'start':tn(1500,t,.03,'triangle',.22,700);tn(220,t,.04,'sine',.18);break;
+    case 'tstart':tn(660,t,.09,'sine',.14);tn(990,t+.06,.13,'sine',.12);break;
+    case 'tstop':tn(880,t,.5,'sine',.12);tn(1318.5,t+.03,.4,'sine',.06);tn(440,t,.3,'sine',.07);break;
     case 'stop':tn(392,t,.45,'sine',.22);tn(587.33,t+.02,.4,'sine',.12);tn(196,t,.5,'sine',.1);break;
     case 'open':tn(640,t,.05,'triangle',.10,950);tn(1120,t+.035,.06,'sine',.06);break;
     case 'close':tn(860,t,.05,'triangle',.09,520);tn(420,t+.03,.07,'sine',.05);break;
@@ -1001,6 +1062,8 @@ const VOICES={
   }},
   keys:(n,t)=>{switch(n){
     case 'start':kb(t,1,330);break;
+    case 'tstart':kb(t,1,260);kb(t+.035,.5,520);break;
+    case 'tstop':kb(t,1.1,210);kb(t+.05,.5,330);tn(110,t,.1,'sine',.12,70);break;
     case 'stop':kb(t,.85,260);kb(t+.06,.3,420);break;
     case 'open':kb(t,.5,380);break;
     case 'close':kb(t,.4,300);break;
@@ -1016,6 +1079,8 @@ const VOICES={
   }},
   cube:(n,t)=>{switch(n){
     case 'start':cb(t,1,1);cb(t+.05,.6,.85);break;
+    case 'tstart':cb(t,.9,1.1);cb(t+.045,.7,.9);cb(t+.09,.5,1.3);break;
+    case 'tstop':cb(t,1,.6);cb(t+.03,.8,1);tn(180,t,.08,'sine',.14,100);break;
     case 'stop':cb(t,.8,.75);cb(t+.07,.5,1.1);break;
     case 'open':cb(t,.6,1.15);break;
     case 'close':cb(t,.5,.85);break;
@@ -1051,7 +1116,7 @@ function snd(n,dl){
 }
 document.addEventListener('click',e=>{
   const t=e.target.closest&&e.target.closest('button,select,input.tg');if(!t)return;
-  if(t.hasAttribute('data-close')||/^(bh|bs|bg|bd|bch|bhelp|bc1|bc2|bc3|cno|cyes|lsave|ldel|mgo|mfail|mword|mreset|chgo|chagain|chdone|chsub)$/.test(t.id))return;
+  if(t.hasAttribute('data-close')||/^(bh|bs|bg|bd|bch|bt|bhelp|bc1|bc2|bc3|cno|cyes|lsave|ldel|mgo|mfail|mword|mreset|chgo|chagain|chdone|chsub)$/.test(t.id))return;
   snd('click');
 });
 document.querySelector('[data-k="sndMode"]').addEventListener('change',()=>{snd('start');snd('stop',.24)});
@@ -1264,6 +1329,223 @@ mword.onclick=()=>{if(st===2)openWI();else openLookup()};
 mreset.onclick=()=>{if(st!==0)snd('err');reset()};
 let lastSt=-1;
 setInterval(()=>{if(st!==lastSt){lastSt=st;mgo.textContent=st===0?'Start':st===1?'Stop':'Next';mfail.disabled=st!==1}},80);
+
+/* ---------- 3x3x3 random-state scrambler (Kociemba two-phase, written from scratch) ---------- */
+const SCR=(function(){
+  const URF=0,UFL=1,ULB=2,UBR=3,DFR=4,DLF=5,DBL=6,DRB=7;
+  const UR=0,UF=1,UL=2,UB=3,DR=4,DF=5,DL=6,DB=7,FR=8,FL=9,BL=10,BR=11;
+  const Z8=[0,0,0,0,0,0,0,0],Z12=[0,0,0,0,0,0,0,0,0,0,0,0];
+  const base=[
+    {cp:[UBR,URF,UFL,ULB,DFR,DLF,DBL,DRB],co:Z8,ep:[UB,UR,UF,UL,DR,DF,DL,DB,FR,FL,BL,BR],eo:Z12},
+    {cp:[DFR,UFL,ULB,URF,DRB,DLF,DBL,UBR],co:[2,0,0,1,1,0,0,2],ep:[FR,UF,UL,UB,BR,DF,DL,DB,DR,FL,BL,UR],eo:Z12},
+    {cp:[UFL,DLF,ULB,UBR,URF,DFR,DBL,DRB],co:[1,2,0,0,2,1,0,0],ep:[UR,FL,UL,UB,DR,FR,DL,DB,UF,DF,BL,BR],eo:[0,1,0,0,0,1,0,0,1,1,0,0]},
+    {cp:[URF,UFL,ULB,UBR,DLF,DBL,DRB,DFR],co:Z8,ep:[UR,UF,UL,UB,DF,DL,DB,DR,FR,FL,BL,BR],eo:Z12},
+    {cp:[URF,ULB,DBL,UBR,DFR,UFL,DLF,DRB],co:[0,1,2,0,0,2,1,0],ep:[UR,UF,BL,UB,DR,DF,FL,DB,FR,UL,DL,BR],eo:Z12},
+    {cp:[URF,UFL,UBR,DRB,DFR,DLF,ULB,DBL],co:[0,0,1,2,0,0,2,1],ep:[UR,UF,UL,BR,DR,DF,DL,BL,FR,FL,UB,DB],eo:[0,0,0,1,0,0,0,1,0,0,1,1]}
+  ];
+  const SOLVED={cp:[0,1,2,3,4,5,6,7],co:Z8.slice(),ep:[0,1,2,3,4,5,6,7,8,9,10,11],eo:Z12.slice()};
+  function mult(a,b){
+    const cp=[],co=[],ep=[],eo=[];
+    for(let c=0;c<8;c++){cp[c]=a.cp[b.cp[c]];co[c]=(a.co[b.cp[c]]+b.co[c])%3}
+    for(let e=0;e<12;e++){ep[e]=a.ep[b.ep[e]];eo[e]=(a.eo[b.ep[e]]+b.eo[e])%2}
+    return{cp:cp,co:co,ep:ep,eo:eo};
+  }
+  const moves=[];
+  base.forEach((m,f)=>{const m2=mult(m,m),m3=mult(m2,m);moves[f*3]=m;moves[f*3+1]=m2;moves[f*3+2]=m3});
+  const FACE='URFDLB',P2M=[0,1,2,9,10,11,4,7,13,16];
+  const FACT=[1,1,2,6,24,120,720,5040,40320];
+  function rank(a,n){let r=0;for(let i=0;i<n-1;i++){let c=0;for(let j=i+1;j<n;j++)if(a[j]<a[i])c++;r+=c*FACT[n-1-i]}return r}
+  function unrank(r,n){const a=[],av=[];for(let i=0;i<n;i++)av.push(i);for(let i=0;i<n;i++){const f=FACT[n-1-i],q=Math.floor(r/f);r-=q*f;a.push(av.splice(q,1)[0])}return a}
+  const sliceIdx=new Int16Array(4096).fill(-1),sliceMask=[];
+  for(let m=4095;m>=0;m--){let b=0;for(let i=0;i<12;i++)b+=(m>>i)&1;if(b===4){sliceIdx[m]=sliceMask.length;sliceMask.push(m)}}
+  function twistOf(co){let t=0;for(let c=0;c<7;c++)t=t*3+co[c];return t}
+  function flipOf(eo){let f=0;for(let e=0;e<11;e++)f=f*2+eo[e];return f}
+  function sliceOf(ep){let m=0;for(let e=0;e<12;e++)if(ep[e]>=8)m|=1<<e;return sliceIdx[m]}
+  let TW,FLP,SL,CP2,EP2,SP2,P1A,P1B,P2A,P2B,ready=false;
+  function* build(){
+    TW=new Int16Array(2187*18);FLP=new Int16Array(2048*18);SL=new Int16Array(495*18);
+    for(let t=0;t<2187;t++){const co=[];let x=t,s=0;for(let c=6;c>=0;c--){co[c]=x%3;x=(x-co[c])/3;s+=co[c]}co[7]=(3-s%3)%3;
+      for(let m=0;m<18;m++){const M=moves[m],n=[];for(let c=0;c<8;c++)n[c]=(co[M.cp[c]]+M.co[c])%3;TW[t*18+m]=twistOf(n)}}
+    yield;
+    for(let f=0;f<2048;f++){const eo=[];let x=f,s=0;for(let e=10;e>=0;e--){eo[e]=x%2;x=(x-eo[e])/2;s+=eo[e]}eo[11]=s%2;
+      for(let m=0;m<18;m++){const M=moves[m],n=[];for(let e=0;e<12;e++)n[e]=(eo[M.ep[e]]+M.eo[e])%2;FLP[f*18+m]=flipOf(n)}}
+    for(let i=0;i<495;i++){const mk=sliceMask[i];
+      for(let m=0;m<18;m++){const M=moves[m];let n=0;for(let e=0;e<12;e++)if((mk>>M.ep[e])&1)n|=1<<e;SL[i*18+m]=sliceIdx[n]}}
+    yield;
+    CP2=new Uint16Array(40320*10);EP2=new Uint16Array(40320*10);SP2=new Uint8Array(24*10);
+    for(let r=0;r<40320;r++){const a=unrank(r,8);
+      for(let k=0;k<10;k++){const M=moves[P2M[k]],nc=[],ne=[];for(let c=0;c<8;c++){nc[c]=a[M.cp[c]];ne[c]=a[M.ep[c]]}CP2[r*10+k]=rank(nc,8);EP2[r*10+k]=rank(ne,8)}
+      if((r&4095)===0)yield}
+    for(let r=0;r<24;r++){const a=unrank(r,4);for(let k=0;k<10;k++){const M=moves[P2M[k]],n=[];for(let i=0;i<4;i++)n[i]=a[M.ep[8+i]-8];SP2[r*10+k]=rank(n,4)}}
+    yield;
+    const q=new Int32Array(40320*24);
+    function* prune(nA,nB,tA,tB,nm,out){
+      out.fill(255);let h=0,tl=0;out[0]=0;q[tl++]=0;
+      while(h<tl){const x=q[h++],a=(x/nB)|0,b=x-a*nB,d=out[x]+1;
+        for(let k=0;k<nm;k++){const i=tA[a*nm+k]*nB+tB[b*nm+k];if(out[i]===255){out[i]=d;q[tl++]=i}}
+        if((h&16383)===0)yield}
+    }
+    P1A=new Uint8Array(2187*495);P1B=new Uint8Array(2048*495);P2A=new Uint8Array(40320*24);P2B=new Uint8Array(40320*24);
+    yield* prune(2187,495,TW,SL,18,P1A);
+    yield* prune(2048,495,FLP,SL,18,P1B);
+    yield* prune(40320,24,CP2,SP2,10,P2A);
+    yield* prune(40320,24,EP2,SP2,10,P2B);
+    ready=true;
+  }
+  /* run the build in short slices so the page stays smooth */
+  function init(done){
+    const g=build();
+    (function step(){const t0=performance.now();let fin=false;
+      while(performance.now()-t0<10){if(g.next().done){fin=true;break}}
+      if(fin){if(done)done()}else setTimeout(step,0)})();
+  }
+  function initSync(){const g=build();while(!g.next().done);}
+  const rp=n=>{const a=[];for(let i=0;i<n;i++)a.push(i);for(let i=n-1;i>0;i--){const j=Math.random()*(i+1)|0,t=a[i];a[i]=a[j];a[j]=t}return a};
+  const par=a=>{let p=0;for(let i=0;i<a.length;i++)for(let j=i+1;j<a.length;j++)if(a[i]>a[j])p^=1;return p};
+  function randState(){
+    const cp=rp(8),ep=rp(12);if(par(cp)!==par(ep)){const t=cp[0];cp[0]=cp[1];cp[1]=t}
+    const co=[],eo=[];let s=0;for(let i=0;i<7;i++){co[i]=Math.random()*3|0;s+=co[i]}co[7]=(3-s%3)%3;
+    s=0;for(let i=0;i<11;i++){eo[i]=Math.random()*2|0;s+=eo[i]}eo[11]=s%2;
+    return{cp:cp,co:co,ep:ep,eo:eo};
+  }
+  function solve(X,ms){
+    const end=performance.now()+ms,path=[],p2=[];let best=null,limit=32,timeUp=false;
+    const t0=twistOf(X.co),f0=flipOf(X.eo),s0=sliceOf(X.ep);
+    function dfs2(c,e,s,depth,lf){
+      if(depth===0)return c===0&&e===0&&s===0;
+      for(let k=0;k<10;k++){const m=P2M[k],face=(m/3)|0;if(face%3===lf%3&&face<=lf)continue;
+        const nc=CP2[c*10+k],ne=EP2[e*10+k],ns=SP2[s*10+k],nd=depth-1;
+        if(P2A[nc*24+ns]>nd||P2B[ne*24+ns]>nd)continue;
+        p2.push(m);if(dfs2(nc,ne,ns,nd,face))return true;p2.pop()}
+      return false;
+    }
+    function leaf(lf){
+      let c=X;for(let i=0;i<path.length;i++)c=mult(c,moves[path[i]]);
+      const cr=rank(c.cp,8),er=rank(c.ep.slice(0,8),8),sr=rank(c.ep.slice(8).map(v=>v-8),4);
+      const maxd2=limit-1-path.length;if(maxd2<0)return;
+      for(let d2=Math.max(P2A[cr*24+sr],P2B[er*24+sr]);d2<=maxd2;d2++){
+        p2.length=0;if(dfs2(cr,er,sr,d2,lf)){best=path.concat(p2);limit=best.length;return}}
+    }
+    function dfs1(t,f,s,depth,lf){
+      if(timeUp)return;
+      if(depth===0){if(t===0&&f===0&&s===0)leaf(lf);return}
+      for(let m=0;m<18;m++){const face=(m/3)|0;if(face%3===lf%3&&face<=lf)continue;
+        const nt=TW[t*18+m],nf=FLP[f*18+m],ns=SL[s*18+m],nd=depth-1;
+        if(P1A[nt*495+ns]>nd||P1B[nf*495+ns]>nd)continue;
+        path.push(m);dfs1(nt,nf,ns,nd,face);path.pop();
+        if(best&&performance.now()>end){timeUp=true;return}}
+    }
+    for(let d1=0;d1<=12&&d1<limit;d1++){
+      if(Math.max(P1A[t0*495+s0],P1B[f0*495+s0])>d1)continue;
+      dfs1(t0,f0,s0,d1,-1);if(timeUp||(best&&performance.now()>end))break}
+    return best;
+  }
+  const pw=['',"2","'"];
+  function fmt(sol){return sol.slice().reverse().map(m=>FACE[(m/3)|0]+pw[2-(m%3)]).join(' ')}
+  function scramble(){
+    for(;;){const sol=solve(randState(),60);if(sol&&sol.length>=2)return fmt(sol)}
+  }
+  function fallback(){
+    const out=[];let lf=-1;
+    while(out.length<20){const f=Math.random()*6|0;if(f%3===lf%3&&f<=lf)continue;lf=f;out.push(FACE[f]+pw[Math.random()*3|0])}
+    return out.join(' ');
+  }
+  function apply(alg){
+    let c=SOLVED;
+    String(alg).split(/\s+/).forEach(tk=>{
+      if(!tk||tk.indexOf('w')>-1)return;
+      const f=FACE.indexOf(tk[0]);if(f<0)return;
+      const p=tk[1]==="'"?2:tk[1]==='2'?1:0;c=mult(c,moves[f*3+p])});
+    return c;
+  }
+  const CF=[[8,9,20],[6,18,38],[0,36,47],[2,45,11],[29,26,15],[27,44,24],[33,53,42],[35,17,51]];
+  const EF=[[5,10],[7,19],[3,37],[1,46],[32,16],[28,25],[30,43],[34,52],[23,12],[21,41],[50,39],[48,14]];
+  const CC=['URF','UFL','ULB','UBR','DFR','DLF','DBL','DRB'],EC=['UR','UF','UL','UB','DR','DF','DL','DB','FR','FL','BL','BR'];
+  function facelets(c){
+    const f=[];
+    for(let i=0;i<8;i++){const j=c.cp[i],o=c.co[i];for(let n=0;n<3;n++)f[CF[i][(n+o)%3]]=CC[j][n]}
+    for(let i=0;i<12;i++){const j=c.ep[i],o=c.eo[i];f[EF[i][o%2]]=EC[j][0];f[EF[i][(1+o)%2]]=EC[j][1]}
+    for(let i=0;i<54;i+=9)f[i+4]='URFDLB'[i/9];
+    return f.join('');
+  }
+  function orient(){
+    const a=['','Rw',"Rw'",'Rw2','Fw',"Fw'"],b=['','Uw',"Uw'",'Uw2'];
+    return (a[Math.random()*6|0]+' '+b[Math.random()*4|0]).trim();
+  }
+  return{init:init,initSync:initSync,get ready(){return ready},scramble:scramble,fallback:fallback,apply:apply,facelets:facelets,orient:orient,randState:randState,solve:solve,fmt:fmt,mult:mult,moves:moves,SOLVED:SOLVED};
+})();
+
+/* ---------- timer: a calm, minimal page ---------- */
+const TM={s:'idle',prev:'idle',t0:0,raf:0,holdTimer:0,scr:'',fb:false,building:false};
+const TM_HINT=matchMedia('(pointer:coarse)').matches?'Press and hold, release when green':'Hold Space until green, release to start';
+function tfmt(ms){const c=Math.floor(ms/10),cs=c%100,sec=Math.floor(c/100),m=Math.floor(sec/60);return(m?m+':'+String(sec%60).padStart(2,'0'):String(sec))+'.'+String(cs).padStart(2,'0')}
+const tmClass=c=>{$('#tpage').className='tpage '+(c||'')};
+const tmHint=t=>{$('#tmh').textContent=t};
+function tmShowScr(){
+  $('#tmsc').innerHTML=TM.scr.split(' ').map((m,i)=>'<span style="--i:'+i+'">'+m[0]+(m.length>1?(m[1]==="'"?'<small class="pr">′</small>':'<small class="dbl">'+m.slice(1)+'</small>'):'')+'</span>').join('');
+}
+function tmNew(){
+  TM.fb=!SCR.ready;
+  TM.scr=SCR.ready?SCR.scramble():SCR.fallback();
+  tmShowScr();
+}
+function tmWarm(){
+  if(SCR.ready||TM.building)return;TM.building=true;
+  SCR.init(()=>{TM.building=false;if(TM.fb&&TM.scr&&(TM.s==='idle'||TM.s==='stop'))tmNew()});
+}
+setTimeout(tmWarm,9000);
+function tmTick(){if(TM.s!=='run')return;$('#tmt').textContent=tfmt(performance.now()-TM.t0);TM.raf=requestAnimationFrame(tmTick)}
+function tmStart(){TM.s='run';TM.t0=performance.now();tmClass('run');tmHint('');snd('tstart');tmTick()}
+function tmStop(){
+  const el=performance.now()-TM.t0;cancelAnimationFrame(TM.raf);
+  TM.s='stop';$('#tmt').textContent=tfmt(el);tmClass('stop');tmHint(TM_HINT);snd('tstop');
+  setTimeout(tmNew,40);
+}
+function tmDown(){
+  if(TM.s==='run'){tmStop();return}
+  if(TM.s!=='idle'&&TM.s!=='stop')return;
+  TM.prev=TM.s;TM.s='hold';tmClass('hold');tmHint('Keep holding');
+  clearTimeout(TM.holdTimer);
+  TM.holdTimer=setTimeout(()=>{if(TM.s==='hold'){TM.s='ready';tmClass('ready');tmHint('Release to start')}},300);
+}
+function tmUp(){
+  if(TM.s==='ready'){tmStart();return}
+  if(TM.s==='hold'){clearTimeout(TM.holdTimer);TM.s=TM.prev;tmClass(TM.prev==='stop'?'stop':'');tmHint(TM_HINT)}
+}
+function tmCancel(){
+  const active=['run','hold','ready'].indexOf(TM.s)>-1;
+  clearTimeout(TM.holdTimer);cancelAnimationFrame(TM.raf);
+  if(active){TM.s='idle';tmClass('');$('#tmt').textContent='0.00';tmHint(TM_HINT)}
+  return active;
+}
+function tmEsc(){return tmCancel()}
+function openTimer(){
+  TM.s='idle';tmClass('');$('#tmt').textContent='0.00';tmHint(TM_HINT);
+  if(!TM.scr)tmNew();else tmShowScr();
+  openM('timer');tmWarm();
+}
+document.addEventListener('keydown',e=>{
+  if(modal!=='timer')return;
+  if(e.code==='Space'){e.preventDefault();if(!e.repeat)tmDown()}
+  else if((e.key==='n'||e.key==='N')&&(TM.s==='idle'||TM.s==='stop')){tmNew()}
+});
+document.addEventListener('keyup',e=>{
+  if(modal!=='timer'||e.code!=='Space')return;
+  e.preventDefault();tmUp();
+});
+const tmEl=$('#timer');
+tmEl.addEventListener('pointerdown',e=>{if(e.target.closest('.tclose'))return;e.preventDefault();tmDown()});
+tmEl.addEventListener('pointerup',e=>{if(e.target.closest('.tclose'))return;e.preventDefault();tmUp()});
+tmEl.addEventListener('pointercancel',()=>{if(TM.s==='hold'||TM.s==='ready'){clearTimeout(TM.holdTimer);TM.s=TM.prev;tmClass(TM.prev==='stop'?'stop':'');tmHint(TM_HINT)}});
+$('#bt').onclick=openTimer;
+(function(){
+  const pal=['#F5F5F0','#F5C518','#D63A3A','#F08A24','#2F6FDB','#2FA84F'],box=$('.tdots');
+  for(let i=0;i<18;i++){
+    const b=document.createElement('b'),sz=10+Math.random()*16,dur=24+Math.random()*22;
+    b.style.cssText='left:'+(Math.random()*98).toFixed(1)+'%;width:'+sz.toFixed(0)+'px;height:'+sz.toFixed(0)+'px;background:'+pal[Math.random()*6|0]+';--o:'+(.16+Math.random()*.2).toFixed(2)+';animation-duration:'+dur.toFixed(1)+'s;animation-delay:-'+(Math.random()*dur).toFixed(1)+'s';
+    box.appendChild(b);
+  }
+})();
 
 /* word lookup */
 const lq=$('#lq'),lw=$('#lw'),ls=$('#ls');
