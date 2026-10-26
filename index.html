@@ -498,6 +498,55 @@ html[data-lt="1"] .tbg i{opacity:.5}
 }
 @media (max-height:640px){.tcube{display:none}}
 @media (prefers-reduced-motion:reduce){.tcfloat{animation:none!important}.tf i{animation:none!important}}
+/* ---------- blindfold refinement: padded woven fabric that wraps cleanly around cube corners ---------- */
+.ibelt{
+  left:-5px;
+  width:calc(100% + 10px);
+  top:33%;
+  height:34%;
+  border-radius:5px;
+  overflow:hidden;
+  background-color:#292d36;
+  background-image:
+    linear-gradient(180deg,rgba(255,255,255,.26) 0%,rgba(255,255,255,.08) 13%,transparent 30%,rgba(0,0,0,.12) 72%,rgba(0,0,0,.42) 100%),
+    repeating-linear-gradient(0deg,rgba(255,255,255,.045) 0 1px,rgba(0,0,0,.075) 1px 2px),
+    repeating-linear-gradient(90deg,rgba(255,255,255,.055) 0 1px,transparent 1px 3px);
+  border-top:1px solid rgba(255,255,255,.48);
+  border-bottom:2px solid rgba(0,0,0,.55);
+  box-shadow:0 3px 5px rgba(0,0,0,.34),0 1px 0 rgba(255,255,255,.22) inset,0 -2px 0 rgba(0,0,0,.22) inset;
+  backface-visibility:visible;
+  -webkit-backface-visibility:visible;
+}
+.ibelt::before{
+  content:"";
+  position:absolute;
+  inset:2px 0;
+  pointer-events:none;
+  opacity:.62;
+  background:repeating-linear-gradient(0deg,transparent 0 3px,rgba(255,255,255,.075) 3px 4px);
+  mix-blend-mode:screen;
+}
+.ibelt::after{
+  content:"";
+  position:absolute;
+  inset:4px 3px;
+  pointer-events:none;
+  border-top:1px dashed rgba(255,255,255,.44);
+  border-bottom:1px dashed rgba(255,255,255,.28);
+  border-radius:2px;
+  opacity:.82;
+}
+/* Each panel slightly overlaps its neighbour: the leading face sits on top at the corner,
+   so the fabric reads as one continuous loop instead of four clipped strips. */
+.bb-front{z-index:4;transform:translateZ(calc(var(--c) / 2 + 3px));}
+.bb-right{z-index:3;transform:rotateY(90deg) translateZ(calc(var(--c) / 2 + 3px));}
+.bb-back{z-index:2;transform:rotateY(180deg) translateZ(calc(var(--c) / 2 + 3px));}
+.bb-left{z-index:1;transform:rotateY(-90deg) translateZ(calc(var(--c) / 2 + 3px));}
+.bb-front{animation-delay:1.55s}
+.bb-right{animation-delay:1.8s}
+.bb-back{animation-delay:2.05s}
+.bb-left{animation-delay:2.3s}
+
 </style>
 </head>
 <body>
