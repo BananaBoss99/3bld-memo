@@ -437,6 +437,7 @@ body.ready #top button:nth-child(5){animation-delay:.33s}
 .tpage.run #tmbar{width:100%;background:var(--acc);opacity:.3}
 .tpage.stop #tmbar{width:100%;background:var(--acc);opacity:.6}
 .tpage.hold .tmt{color:var(--r)}.tpage.ready .tmt{color:var(--g)}.tpage.stop .tmt{color:var(--acc)}
+.tmsc .tmload{font-size:1.1rem!important;font-weight:500;color:var(--muted);letter-spacing:.04em;animation:tmlp 1.2s ease-in-out infinite alternate}@keyframes tmlp{from{opacity:.4}to{opacity:1}}
 .tmh{color:var(--muted);font-size:.85rem;margin-top:1rem;min-height:1.3em;letter-spacing:.03em}
 #top #bt:hover{transform:rotate(12deg) scale(1.2)}
 @media (hover:none){#top #bt:hover{transform:none}}
@@ -1538,15 +1539,23 @@ function tmShowScr(){
   $('#tmsc').innerHTML=TM.scr.split(' ').map((m,i)=>'<span style="--i:'+i+'">'+m[0]+(m.length>1?(m[1]==="'"?'<small class="pr">′</small>':'<small class="dbl">'+m.slice(1)+'</small>'):'')+'</span>').join('');
 }
 function tmNew(){
-  TM.fb=!SCR.ready;
-  TM.scr=SCR.ready?SCR.scramble():SCR.fallback();
+  /* never show a placeholder scramble: wait for the real generator, then show the final one */
+  if(!SCR.ready){
+    TM.scr='';tcRender();
+    $('#tmsc').innerHTML='<span class="tmload" style="--i:0">Preparing scramble\u2026</span>';
+    tmHint('Getting ready\u2026');
+    tmWarm();return;
+  }
+  TM.scr=SCR.scramble();
   tmShowScr();
+  if(TM.s==='idle'||TM.s==='stop')tmHint(TM_HINT);
 }
 function tmWarm(){
   if(SCR.ready||TM.building)return;TM.building=true;
-  SCR.init(()=>{TM.building=false;if(TM.fb&&TM.scr&&(TM.s==='idle'||TM.s==='stop'))tmNew()});
+  SCR.init(()=>{TM.building=false;if(!TM.scr&&(TM.s==='idle'||TM.s==='stop'))tmNew()});
 }
-setTimeout(tmWarm,9000);
+/* build the scrambler tables in the background while the intro plays */
+setTimeout(tmWarm,50);
 function tmTick(){if(TM.s!=='run')return;$('#tmt').textContent=tfmt(performance.now()-TM.t0);TM.raf=requestAnimationFrame(tmTick)}
 function tmStart(){TM.s='run';TM.t0=performance.now();tmClass('run');tmHint('');snd('tstart');tmTick()}
 function tmStop(){
@@ -1557,6 +1566,7 @@ function tmStop(){
 function tmDown(){
   if(TM.s==='run'){tmStop();return}
   if(TM.s!=='idle'&&TM.s!=='stop')return;
+  if(!SCR.ready)return;
   TM.prev=TM.s;TM.s='hold';tmClass('hold');tmHint('Keep holding');
   clearTimeout(TM.holdTimer);
   TM.holdTimer=setTimeout(()=>{if(TM.s==='hold'){TM.s='ready';tmClass('ready');tmHint('Release to start')}},300);
