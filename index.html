@@ -305,6 +305,8 @@ body.zenmode #sclk{opacity:0;pointer-events:none}
 .ibar i{display:block;height:100%;background:var(--acc);transform-origin:left;transform:scaleX(0);animation:ibar 4.2s cubic-bezier(.3,.6,.3,1) forwards}
 @keyframes ibar{to{transform:scaleX(1)}}
 
+/* ===== CUBE CAP LOGO: swap this for any PNG (path or full URL). Transparent background works best. ===== */
+:root{--cap-logo:url("gan-logo.png")}
 /* ---------- intro v4: 3D cube + blindfold ---------- */
 .ilogo{--c:clamp(110px,28vw,150px);width:var(--c);height:var(--c);margin:1.4rem 0 1rem;perspective:800px}
 .iring{inset:-70px}
@@ -312,9 +314,24 @@ body.zenmode #sclk{opacity:0;pointer-events:none}
 .icube{position:absolute;inset:0;transform-style:preserve-3d;transform:rotateX(-26deg) rotateY(-40deg);animation:icin 1.5s cubic-bezier(.32,.72,0,1) backwards,icspin 11s linear 1.5s infinite}
 @keyframes icin{from{transform:rotateX(-26deg) rotateY(-150deg) scale(.55)}}
 @keyframes icspin{from{transform:rotateX(-26deg) rotateY(-40deg)}to{transform:rotateX(-26deg) rotateY(320deg)}}
-.iface{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:3px;padding:3px;background:#0b0b0d;border-radius:7px}
-.iface i{border-radius:3px;background:var(--cc);animation:ist .5s cubic-bezier(.34,1.56,.64,1) backwards;animation-delay:calc(var(--d) * 40ms + .1s)}
+.iface{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:1.2px;padding:.8px;background:#2d2d33;border-radius:6px;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.iface i{position:relative;border-radius:5px;background:radial-gradient(120% 90% at 26% 8%,rgba(255,255,255,.2),rgba(255,255,255,0) 55%),linear-gradient(155deg,rgba(255,255,255,.14),rgba(255,255,255,0) 45%,rgba(0,0,0,.1)),var(--cc);box-shadow:inset 0 0 0 .5px rgba(0,0,0,.2),inset 0 1px 1px rgba(255,255,255,.3),inset 0 -2px 3px rgba(0,0,0,.12);animation:ist .5s cubic-bezier(.34,1.56,.64,1) backwards;animation-delay:calc(var(--d) * 40ms + .1s)}
 @keyframes ist{from{transform:scale(0);opacity:0}}
+/* solid black core: closes the corner gaps so you can never see inside */
+.icore{position:absolute;inset:0;transform-style:preserve-3d;pointer-events:none}
+.icore b{position:absolute;inset:0;background:#2d2d33;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.icore b:nth-child(1){transform:translateZ(calc(var(--c) / 2 - 2px))}
+.icore b:nth-child(2){transform:rotateY(180deg) translateZ(calc(var(--c) / 2 - 2px))}
+.icore b:nth-child(3){transform:rotateY(90deg) translateZ(calc(var(--c) / 2 - 2px))}
+.icore b:nth-child(4){transform:rotateY(-90deg) translateZ(calc(var(--c) / 2 - 2px))}
+.icore b:nth-child(5){transform:rotateX(90deg) translateZ(calc(var(--c) / 2 - 2px))}
+.icore b:nth-child(6){transform:rotateX(-90deg) translateZ(calc(var(--c) / 2 - 2px))}
+/* UV glint sweeping over each face */
+.iface::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(115deg,transparent 36%,rgba(255,255,255,.2) 49%,transparent 62%) 150% 0/300% 100% no-repeat;animation:ishine 11s linear infinite}
+.f-right::after{animation-delay:-2.75s}.f-back::after{animation-delay:-5.5s}.f-left::after{animation-delay:-8.25s}.f-top::after{animation-delay:-4s}.f-bottom::after{animation-delay:-9s}
+@keyframes ishine{0%{background-position:150% 0}30%,100%{background-position:-50% 0}}
+/* GAN logo on the white centre cap */
+.iface i.gan::after{content:"";position:absolute;inset:0;background:var(--cap-logo) center/64% no-repeat}
 .f-front{transform:translateZ(calc(var(--c) / 2))}
 .f-back{transform:rotateY(180deg) translateZ(calc(var(--c) / 2))}
 .f-right{transform:rotateY(90deg) translateZ(calc(var(--c) / 2))}
@@ -333,7 +350,7 @@ body.zenmode #sclk{opacity:0;pointer-events:none}
 .ibar i{animation-duration:5s}
 @keyframes ifloat{0%{opacity:0;transform:translateY(16px) scale(.9)}25%{opacity:var(--o)}100%{opacity:0;transform:translateY(-14vh) scale(1.05)}}
 #streak.enter{animation:sfade .6s cubic-bezier(.32,.72,0,1)}
-@media (prefers-reduced-motion:reduce){.icube,.ibelt,.iface i{animation:none!important}}
+@media (prefers-reduced-motion:reduce){.icube,.ibelt,.iface i,.iface::after{animation:none!important}}
 
 .ilogo{animation:ibob 3.4s ease-in-out 1s infinite}
 .iface{animation:ifd .7s ease-out backwards}
@@ -445,14 +462,49 @@ html[data-lt="1"] .tbg i{opacity:.5}
 @keyframes tfl{0%{opacity:0;transform:translateY(0) rotate(0)}10%{opacity:var(--o)}85%{opacity:var(--o)}100%{opacity:0;transform:translateY(-115vh) rotate(220deg)}}
 .tbg::after{content:"";position:absolute;inset:0;background:radial-gradient(70% 60% at 50% 45%,transparent 38%,color-mix(in srgb,var(--bg) 72%,transparent) 100%)}
 @media (prefers-reduced-motion:reduce){.tbg i,.tgrid,.tdots b{animation:none!important}}
+
+/* ---------- 3D scramble cube ---------- */
+.tmcol{display:flex;flex-direction:column;align-items:center}
+.tcube{--cs:clamp(120px,34vw,190px);position:relative;flex:none;width:calc(var(--cs) * 1.55);height:calc(var(--cs) * 1.55);display:flex;align-items:center;justify-content:center;cursor:grab;touch-action:none;margin-top:1.2rem}
+.tcube.drag{cursor:grabbing}
+.tcfloat{perspective:1200px;animation:tcbob 7s ease-in-out infinite}
+@keyframes tcbob{50%{transform:translateY(-6px)}}
+.tc3d{position:relative;width:var(--cs);height:var(--cs);transform-style:preserve-3d;will-change:transform}
+.tcshadow{position:absolute;left:50%;bottom:3%;width:62%;height:11%;margin-left:-31%;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.45),transparent);filter:blur(7px)}
+.tf{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:calc(var(--cs) * .007);padding:calc(var(--cs) * .004);background:#2d2d33;border-radius:calc(var(--cs) * .04);backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.tf::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(65% 65% at var(--gx,30%) var(--gy,20%),rgba(255,255,255,var(--gi,.06)),transparent 75%),linear-gradient(rgba(0,0,0,var(--gd,.1)),rgba(0,0,0,var(--gd,.1)))}
+.tcore{position:absolute;inset:0;transform-style:preserve-3d;pointer-events:none}
+.tcore b{position:absolute;inset:0;background:#2d2d33;backface-visibility:hidden;-webkit-backface-visibility:hidden;--z:calc(var(--cs) * .485)}
+.tcore b:nth-child(1){transform:translateZ(var(--z))}
+.tcore b:nth-child(2){transform:rotateY(180deg) translateZ(var(--z))}
+.tcore b:nth-child(3){transform:rotateY(90deg) translateZ(var(--z))}
+.tcore b:nth-child(4){transform:rotateY(-90deg) translateZ(var(--z))}
+.tcore b:nth-child(5){transform:rotateX(90deg) translateZ(var(--z))}
+.tcore b:nth-child(6){transform:rotateX(-90deg) translateZ(var(--z))}
+.tf i.gan{position:relative}
+.tf i.gan::after{content:"";position:absolute;inset:0;background:var(--cap-logo) center/64% no-repeat}
+.tf i{border-radius:calc(var(--cs) * .03);background:radial-gradient(120% 90% at 26% 8%,rgba(255,255,255,.2),rgba(255,255,255,0) 55%),linear-gradient(155deg,rgba(255,255,255,.13),rgba(255,255,255,0) 45%,rgba(0,0,0,.1)),var(--c);box-shadow:inset 0 0 0 .5px rgba(0,0,0,.2),inset 0 calc(var(--cs) * .004) calc(var(--cs) * .006) rgba(255,255,255,.3),inset 0 calc(var(--cs) * -.01) calc(var(--cs) * .02) rgba(0,0,0,.12);animation:tspop .5s cubic-bezier(.34,1.56,.64,1) backwards;animation-delay:calc(var(--k) * 16ms)}
+@keyframes tspop{from{transform:scale(0);opacity:0}}
+.tf-f{transform:translateZ(calc(var(--cs) / 2))}
+.tf-b{transform:rotateY(180deg) translateZ(calc(var(--cs) / 2))}
+.tf-r{transform:rotateY(90deg) translateZ(calc(var(--cs) / 2))}
+.tf-l{transform:rotateY(-90deg) translateZ(calc(var(--cs) / 2))}
+.tf-u{transform:rotateX(90deg) translateZ(calc(var(--cs) / 2))}
+.tf-d{transform:rotateX(-90deg) translateZ(calc(var(--cs) / 2))}
+@media (min-width:900px){
+  .tmmain{flex-direction:row;gap:clamp(2rem,6vw,6rem)}
+  .tcube{--cs:clamp(190px,21vw,280px);margin-top:0}
+}
+@media (max-height:640px){.tcube{display:none}}
+@media (prefers-reduced-motion:reduce){.tcfloat{animation:none!important}.tf i{animation:none!important}}
 </style>
 </head>
 <body>
 <div id="intro" class="hold" aria-hidden="true">
-<div class="ilogo"><div class="iglow"></div><div class="iring"></div><div class="icube"><div class="iface f-front"><i style="--cc:#F08A24;--d:0"></i><i style="--cc:#2F6FDB;--d:1"></i><i style="--cc:#F08A24;--d:2"></i><i style="--cc:#F08A24;--d:1"></i><i style="--cc:#2F6FDB;--d:2"></i><i style="--cc:#2F6FDB;--d:3"></i><i style="--cc:#F5C518;--d:2"></i><i style="--cc:#F5C518;--d:3"></i><i style="--cc:#2F6FDB;--d:4"></i></div><div class="iface f-back"><i style="--cc:#F08A24;--d:3"></i><i style="--cc:#2FA84F;--d:4"></i><i style="--cc:#2F6FDB;--d:5"></i><i style="--cc:#F5C518;--d:4"></i><i style="--cc:#F5F5F0;--d:5"></i><i style="--cc:#F08A24;--d:6"></i><i style="--cc:#D63A3A;--d:5"></i><i style="--cc:#F5C518;--d:6"></i><i style="--cc:#F5F5F0;--d:7"></i></div><div class="iface f-right"><i style="--cc:#2F6FDB;--d:6"></i><i style="--cc:#2FA84F;--d:7"></i><i style="--cc:#2FA84F;--d:8"></i><i style="--cc:#F5F5F0;--d:7"></i><i style="--cc:#2F6FDB;--d:8"></i><i style="--cc:#F08A24;--d:9"></i><i style="--cc:#F08A24;--d:8"></i><i style="--cc:#2FA84F;--d:9"></i><i style="--cc:#2FA84F;--d:10"></i></div><div class="iface f-left"><i style="--cc:#2F6FDB;--d:9"></i><i style="--cc:#2FA84F;--d:10"></i><i style="--cc:#F5C518;--d:11"></i><i style="--cc:#2F6FDB;--d:10"></i><i style="--cc:#F5F5F0;--d:11"></i><i style="--cc:#2F6FDB;--d:12"></i><i style="--cc:#F5F5F0;--d:11"></i><i style="--cc:#F5F5F0;--d:12"></i><i style="--cc:#F5F5F0;--d:13"></i></div><div class="iface f-top"><i style="--cc:#F5C518;--d:12"></i><i style="--cc:#F5C518;--d:13"></i><i style="--cc:#2F6FDB;--d:14"></i><i style="--cc:#F5F5F0;--d:13"></i><i style="--cc:#F08A24;--d:14"></i><i style="--cc:#D63A3A;--d:15"></i><i style="--cc:#F08A24;--d:14"></i><i style="--cc:#2F6FDB;--d:15"></i><i style="--cc:#F5C518;--d:16"></i></div><div class="iface f-bottom"><i style="--cc:#2F6FDB;--d:15"></i><i style="--cc:#F5C518;--d:16"></i><i style="--cc:#2FA84F;--d:17"></i><i style="--cc:#D63A3A;--d:16"></i><i style="--cc:#F08A24;--d:17"></i><i style="--cc:#F5F5F0;--d:18"></i><i style="--cc:#2FA84F;--d:17"></i><i style="--cc:#F5F5F0;--d:18"></i><i style="--cc:#F08A24;--d:19"></i></div><div class="ibelt bb-front"></div><div class="ibelt bb-right"></div><div class="ibelt bb-back"></div><div class="ibelt bb-left"></div></div></div>
+<div class="ilogo"><div class="iglow"></div><div class="iring"></div><div class="icube"><div class="iface f-front"><i style="--cc:#F08A24;--d:0"></i><i style="--cc:#2F6FDB;--d:1"></i><i style="--cc:#F08A24;--d:2"></i><i style="--cc:#F08A24;--d:1"></i><i style="--cc:#2F6FDB;--d:2"></i><i style="--cc:#2F6FDB;--d:3"></i><i style="--cc:#F5C518;--d:2"></i><i style="--cc:#F5C518;--d:3"></i><i style="--cc:#2F6FDB;--d:4"></i></div><div class="iface f-back"><i style="--cc:#F08A24;--d:3"></i><i style="--cc:#2FA84F;--d:4"></i><i style="--cc:#2F6FDB;--d:5"></i><i style="--cc:#F5C518;--d:4"></i><i style="--cc:#F5F5F0;--d:5"></i><i style="--cc:#F08A24;--d:6"></i><i style="--cc:#D63A3A;--d:5"></i><i style="--cc:#F5C518;--d:6"></i><i style="--cc:#F5F5F0;--d:7"></i></div><div class="iface f-right"><i style="--cc:#2F6FDB;--d:6"></i><i style="--cc:#2FA84F;--d:7"></i><i style="--cc:#2FA84F;--d:8"></i><i style="--cc:#F5F5F0;--d:7"></i><i style="--cc:#2F6FDB;--d:8"></i><i style="--cc:#F08A24;--d:9"></i><i style="--cc:#F08A24;--d:8"></i><i style="--cc:#2FA84F;--d:9"></i><i style="--cc:#2FA84F;--d:10"></i></div><div class="iface f-left"><i style="--cc:#2F6FDB;--d:9"></i><i style="--cc:#2FA84F;--d:10"></i><i style="--cc:#F5C518;--d:11"></i><i style="--cc:#2F6FDB;--d:10"></i><i style="--cc:#F5F5F0;--d:11"></i><i style="--cc:#2F6FDB;--d:12"></i><i style="--cc:#F5F5F0;--d:11"></i><i style="--cc:#F5F5F0;--d:12"></i><i style="--cc:#F5F5F0;--d:13"></i></div><div class="iface f-top"><i style="--cc:#F5C518;--d:12"></i><i style="--cc:#F5C518;--d:13"></i><i style="--cc:#2F6FDB;--d:14"></i><i style="--cc:#F5F5F0;--d:13"></i><i class="gan" style="--cc:#F5F5F0;--d:14"></i><i style="--cc:#D63A3A;--d:15"></i><i style="--cc:#F08A24;--d:14"></i><i style="--cc:#2F6FDB;--d:15"></i><i style="--cc:#F5C518;--d:16"></i></div><div class="iface f-bottom"><i style="--cc:#2F6FDB;--d:15"></i><i style="--cc:#F5C518;--d:16"></i><i style="--cc:#2FA84F;--d:17"></i><i style="--cc:#D63A3A;--d:16"></i><i style="--cc:#F08A24;--d:17"></i><i style="--cc:#F5F5F0;--d:18"></i><i style="--cc:#2FA84F;--d:17"></i><i style="--cc:#F5F5F0;--d:18"></i><i style="--cc:#F08A24;--d:19"></i></div><div class="icore"><b></b><b></b><b></b><b></b><b></b><b></b></div><div class="ibelt bb-front"></div><div class="ibelt bb-right"></div><div class="ibelt bb-back"></div><div class="ibelt bb-left"></div></div></div>
 <div class="iword"><span style="--l:0">3</span><span style="--l:1">B</span><span style="--l:2">L</span><span style="--l:3">D</span></div>
 <div class="isub">Letter pair trainer</div>
-<div class="iby">by <b>nBananaBoss</b></div>
+<div class="iby">by <b>Claude</b></div>
 </div>
 <div id="bgfx"><i></i><i></i><i></i></div>
 <a id="sclk" href="https://cstimer.net/" target="_blank" rel="noopener noreferrer" tabindex="-1" title="Open csTimer">0:00</a>
@@ -620,7 +672,7 @@ C,cat,cabin,cucumber</pre>
 <button class="tclose" data-close type="button" aria-label="Close timer">Close</button>
 <div class="tpage" id="tpage">
 <div id="tmsc" class="tmsc"></div>
-<div class="tmmain"><div id="tmt" class="tmt">0.00</div><div class="tmline"><i id="tmbar"></i></div><div id="tmh" class="tmh"></div></div>
+<div class="tmmain"><div class="tmcol"><div id="tmt" class="tmt">0.00</div><div class="tmline"><i id="tmbar"></i></div><div id="tmh" class="tmh"></div></div><div class="tcube" id="tcube" title="Drag to rotate, double-click to reset" aria-label="3D view of the scramble, drag to rotate"><div class="tcshadow"></div><div class="tcfloat"><div class="tc3d" id="tc3d"></div></div></div></div>
 </div>
 </div>
 
@@ -1482,6 +1534,7 @@ function tfmt(ms){const c=Math.floor(ms/10),cs=c%100,sec=Math.floor(c/100),m=Mat
 const tmClass=c=>{$('#tpage').className='tpage '+(c||'')};
 const tmHint=t=>{$('#tmh').textContent=t};
 function tmShowScr(){
+  tcRender();
   $('#tmsc').innerHTML=TM.scr.split(' ').map((m,i)=>'<span style="--i:'+i+'">'+m[0]+(m.length>1?(m[1]==="'"?'<small class="pr">′</small>':'<small class="dbl">'+m.slice(1)+'</small>'):'')+'</span>').join('');
 }
 function tmNew(){
@@ -1534,10 +1587,70 @@ document.addEventListener('keyup',e=>{
   e.preventDefault();tmUp();
 });
 const tmEl=$('#timer');
-tmEl.addEventListener('pointerdown',e=>{if(e.target.closest('.tclose'))return;e.preventDefault();tmDown()});
-tmEl.addEventListener('pointerup',e=>{if(e.target.closest('.tclose'))return;e.preventDefault();tmUp()});
+tmEl.addEventListener('pointerdown',e=>{if(e.target.closest('.tclose,.tcube'))return;e.preventDefault();tmDown()});
+tmEl.addEventListener('pointerup',e=>{if(e.target.closest('.tclose,.tcube'))return;e.preventDefault();tmUp()});
 tmEl.addEventListener('pointercancel',()=>{if(TM.s==='hold'||TM.s==='ready'){clearTimeout(TM.holdTimer);TM.s=TM.prev;tmClass(TM.prev==='stop'?'stop':'');tmHint(TM_HINT)}});
 $('#bt').onclick=openTimer;
+/* ---------- 3D scramble cube (drag to rotate) ---------- */
+const TC={rx:-26,ry:-38,vx:0,vy:0,drag:false,lx:0,ly:0,raf:0};
+const TC_COL={U:'#F5F5F0',R:'#D63A3A',F:'#2FA84F',D:'#F5C518',L:'#F08A24',B:'#2F6FDB'},TC_FACE=['u','r','f','d','l','b'];
+const tcClamp=v=>Math.max(-88,Math.min(88,v));
+const TC_N={u:[0,-1,0],r:[1,0,0],f:[0,0,1],d:[0,1,0],l:[-1,0,0],b:[0,0,-1]};
+const TC_UV={f:[[1,0,0],[0,1,0]],b:[[-1,0,0],[0,1,0]],r:[[0,0,-1],[0,1,0]],l:[[0,0,1],[0,1,0]],u:[[1,0,0],[0,0,1]],d:[[1,0,0],[0,0,-1]]};
+const TC_L=(()=>{const v=[-.45,-.6,.66],m=Math.hypot(...v);return v.map(x=>x/m)})();
+const TC_H=(()=>{const v=[TC_L[0],TC_L[1],TC_L[2]+1],m=Math.hypot(...v);return v.map(x=>x/m)})();
+const tcDot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+function tcRot(v){
+  const a=TC.ry*Math.PI/180,b=TC.rx*Math.PI/180;
+  const x=v[0]*Math.cos(a)+v[2]*Math.sin(a),z=-v[0]*Math.sin(a)+v[2]*Math.cos(a);
+  return [x,v[1]*Math.cos(b)-z*Math.sin(b),v[1]*Math.sin(b)+z*Math.cos(b)];
+}
+function tcApply(){
+  const el=$('#tc3d');el.style.transform='rotateX('+TC.rx+'deg) rotateY('+TC.ry+'deg)';
+  /* live UV gloss: light stays fixed, highlights slide across the faces as the cube turns */
+  el.querySelectorAll('.tf').forEach(f=>{
+    const k=f.className.slice(-1),n=tcRot(TC_N[k]),u=tcRot(TC_UV[k][0]),v=tcRot(TC_UV[k][1]);
+    const diff=Math.max(0,tcDot(n,TC_L)),spec=Math.pow(Math.max(0,tcDot(n,TC_H)),9);
+    f.style.setProperty('--gi',(.06+.3*spec).toFixed(3));
+    f.style.setProperty('--gd',(.2*(1-diff)).toFixed(3));
+    f.style.setProperty('--gx',(50+55*tcDot(TC_L,u)).toFixed(1)+'%');
+    f.style.setProperty('--gy',(50+55*tcDot(TC_L,v)).toFixed(1)+'%');
+  });
+}
+function tcRender(){
+  const f=SCR.facelets(SCR.apply(TM.scr||''));let h='';
+  for(let fi=0;fi<6;fi++){
+    h+='<div class="tf tf-'+TC_FACE[fi]+'">';
+    for(let k=0;k<9;k++)h+='<i'+(fi===0&&k===4?' class="gan"':'')+' style="--c:'+TC_COL[f[fi*9+k]]+';--k:'+(fi*4+k)+'"></i>';
+    h+='</div>';
+  }
+  h+='<div class="tcore"><b></b><b></b><b></b><b></b><b></b><b></b></div>';
+  $('#tc3d').innerHTML=h;tcApply();
+}
+const tcEl=$('#tcube');
+tcEl.addEventListener('pointerdown',e=>{
+  if(TM.s==='run'){tmStop();return}
+  TC.drag=true;TC.lx=e.clientX;TC.ly=e.clientY;TC.vx=TC.vy=0;cancelAnimationFrame(TC.raf);
+  try{tcEl.setPointerCapture(e.pointerId)}catch(_){}
+  tcEl.classList.add('drag');e.preventDefault();
+});
+tcEl.addEventListener('pointermove',e=>{
+  if(!TC.drag)return;
+  const dx=e.clientX-TC.lx,dy=e.clientY-TC.ly;TC.lx=e.clientX;TC.ly=e.clientY;
+  TC.ry+=dx*.55;TC.rx=tcClamp(TC.rx-dy*.55);TC.vx=dx*.55;TC.vy=-dy*.55;tcApply();
+});
+function tcEnd(){
+  if(!TC.drag)return;TC.drag=false;tcEl.classList.remove('drag');
+  (function step(){TC.ry+=TC.vx;TC.rx=tcClamp(TC.rx+TC.vy);TC.vx*=.93;TC.vy*=.93;tcApply();
+    if(Math.abs(TC.vx)+Math.abs(TC.vy)>.05)TC.raf=requestAnimationFrame(step)})();
+}
+tcEl.addEventListener('pointerup',tcEnd);tcEl.addEventListener('pointercancel',tcEnd);
+tcEl.addEventListener('dblclick',()=>{
+  cancelAnimationFrame(TC.raf);
+  TC.ry=((TC.ry%360)+540)%360-180;TC.ry+=((-38-TC.ry+540)%360)-180;TC.rx=-26;
+  const el=$('#tc3d');el.style.transition='transform .6s cubic-bezier(.32,.72,0,1)';tcApply();
+  setTimeout(()=>{el.style.transition=''},650);
+});
 (function(){
   const pal=['#F5F5F0','#F5C518','#D63A3A','#F08A24','#2F6FDB','#2FA84F'],box=$('.tdots');
   for(let i=0;i<18;i++){
