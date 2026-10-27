@@ -547,6 +547,97 @@ html[data-lt="1"] .tbg i{opacity:.5}
 .bb-back{animation-delay:2.05s}
 .bb-left{animation-delay:2.3s}
 
+/* =====================================================================
+   TIMER BACKGROUND ONLY: aurora, stars, light beam, grain
+   (timer text, scramble and cube are untouched)
+   ===================================================================== */
+.tbg{background:radial-gradient(130% 90% at 50% 115%,color-mix(in srgb,var(--b2,var(--acc)) 20%,var(--bg)),var(--bg) 62%)}
+
+/* richer, softly glowing colour blobs that blend into each other */
+.tbg i{filter:blur(90px);opacity:.42;mix-blend-mode:screen}
+html[data-lt="1"] .tbg i{mix-blend-mode:normal;opacity:.5}
+
+/* slow swirling aurora ribbons */
+.taur{position:absolute;left:50%;top:50%;width:150vmax;height:150vmax;margin:-75vmax 0 0 -75vmax;pointer-events:none;
+  background:conic-gradient(from 0deg,transparent 0deg,var(--b1,var(--acc)) 40deg,transparent 95deg,var(--b3,#2DD4BF) 170deg,transparent 225deg,var(--b2,#7C6CF0) 290deg,transparent 340deg);
+  filter:blur(80px);opacity:.3;mix-blend-mode:screen;
+  -webkit-mask-image:radial-gradient(closest-side,#000 15%,transparent 78%);mask-image:radial-gradient(closest-side,#000 15%,transparent 78%);
+  animation:taurspin 90s linear infinite}
+@keyframes taurspin{to{transform:rotate(360deg)}}
+html[data-lt="1"] .taur{mix-blend-mode:normal;opacity:.22}
+
+/* soft light falling from above, like a spotlight on the time */
+.tbg::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(38% 75% at 50% -8%,color-mix(in srgb,var(--acc) 20%,transparent),transparent 72%),
+             radial-gradient(60% 30% at 50% 100%,color-mix(in srgb,var(--acc) 12%,transparent),transparent 80%);
+  animation:tbeam 12s ease-in-out infinite alternate}
+@keyframes tbeam{from{opacity:.65}to{opacity:1}}
+
+/* twinkling stars */
+.tstars{position:absolute;inset:0;pointer-events:none}
+.tstars b{position:absolute;border-radius:50%;background:color-mix(in srgb,#fff 88%,var(--acc));box-shadow:0 0 6px color-mix(in srgb,var(--acc) 70%,transparent);opacity:0;animation:ttw ease-in-out infinite}
+@keyframes ttw{0%,100%{opacity:0;transform:scale(.6)}50%{opacity:var(--o);transform:scale(1)}}
+html[data-lt="1"] .tstars{display:none}
+
+/* floor grid: finer, fainter, fades into the horizon */
+.tgrid{opacity:.5;background-size:80px 80px;
+  background-image:linear-gradient(color-mix(in srgb,var(--acc) 20%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--acc) 20%,transparent) 1px,transparent 1px);
+  animation-duration:9s}
+@keyframes tgmove{to{background-position:0 80px}}
+
+/* fine film grain over everything for a premium, non-flat feel */
+.tgrain{position:absolute;inset:0;pointer-events:none;opacity:.07;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+html[data-lt="1"] .tgrain{opacity:.05;mix-blend-mode:multiply}
+
+/* keep the vignette (already above) but a touch deeper so the time pops */
+.tbg::after{z-index:1;background:radial-gradient(72% 62% at 50% 46%,transparent 34%,color-mix(in srgb,var(--bg) 78%,transparent) 100%)}
+@media (prefers-reduced-motion:reduce){.taur,.tbg::before,.tstars b{animation:none!important}.tstars b{opacity:.4}}
+
+/* =====================================================================
+   LIGHT THEMES (sage, meadow, sunset, lagoon, lavender, light):
+   much more visible, built for pale backgrounds
+   ===================================================================== */
+html[data-lt="1"] .tbg{background:linear-gradient(180deg,color-mix(in srgb,#fff 60%,var(--bg)) 0%,var(--bg) 40%,color-mix(in srgb,var(--acc) 22%,var(--bg)) 100%)}
+html[data-lt="1"] .tbg i{filter:blur(70px);opacity:.85;mix-blend-mode:normal}
+html[data-lt="1"] .tbg i:nth-child(1){background:color-mix(in srgb,var(--acc) 42%,var(--b1,var(--acc)))}
+html[data-lt="1"] .tbg i:nth-child(2){background:color-mix(in srgb,var(--acc) 34%,var(--b2,var(--acc)))}
+html[data-lt="1"] .tbg i:nth-child(3){background:color-mix(in srgb,#F6D68A 55%,var(--b3,var(--acc)))}
+html[data-lt="1"] .taur{opacity:.6;filter:blur(60px);mix-blend-mode:normal;
+  background:conic-gradient(from 0deg,transparent 0deg,color-mix(in srgb,var(--acc) 55%,var(--b1,var(--acc))) 45deg,transparent 100deg,color-mix(in srgb,#F6D68A 70%,var(--b3,var(--acc))) 175deg,transparent 230deg,color-mix(in srgb,var(--acc) 45%,var(--b2,var(--acc))) 295deg,transparent 345deg)}
+html[data-lt="1"] .tbg::before{background:radial-gradient(42% 80% at 50% -6%,rgba(255,255,255,.95),rgba(255,255,255,0) 72%),radial-gradient(60% 34% at 50% 104%,color-mix(in srgb,var(--acc) 30%,transparent),transparent 80%)}
+/* fireflies instead of stars */
+html[data-lt="1"] .tstars{display:block}
+html[data-lt="1"] .tstars b{width:6px!important;height:6px!important;background:radial-gradient(circle,#fff 0,#FBE6A2 35%,rgba(246,214,138,0) 70%);box-shadow:0 0 14px 4px color-mix(in srgb,#F3C969 65%,transparent);animation:tfire 7s ease-in-out infinite}
+@keyframes tfire{0%,100%{opacity:0;transform:translate(0,0) scale(.6)}25%{opacity:var(--o)}50%{opacity:calc(var(--o) * .5);transform:translate(14px,-22px) scale(1)}75%{opacity:var(--o)}}
+html[data-lt="1"] .tgrid{opacity:.7;background-image:linear-gradient(color-mix(in srgb,var(--acc) 30%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--acc) 30%,transparent) 1px,transparent 1px)}
+html[data-lt="1"] .tgrain{opacity:.09;mix-blend-mode:multiply}
+html[data-lt="1"] .tbg::after{background:radial-gradient(75% 65% at 50% 46%,transparent 45%,color-mix(in srgb,var(--acc) 14%,var(--bg)) 100%)}
+
+
+/* =====================================================================
+   LIGHT THEMES, REFINED: soft pastel glows that stay out of the scramble.
+   Dark themes are untouched (everything below is scoped to data-lt="1").
+   The colour now pools around the bottom and the far side edges, the top
+   centre (where the scramble sits) stays clean and bright.
+   ===================================================================== */
+html[data-lt="1"] .tbg{background:linear-gradient(180deg,color-mix(in srgb,#fff 70%,var(--bg)) 0%,var(--bg) 45%,color-mix(in srgb,var(--acc) 12%,var(--bg)) 100%)}
+html[data-lt="1"] .tbg i{filter:blur(90px);opacity:.55}
+html[data-lt="1"] .tbg i:nth-child(1){width:46vmax;height:46vmax;left:-24vmax;top:auto;bottom:-14vmax;background:color-mix(in srgb,#fff 38%,var(--b1,var(--acc)));animation:tlb1 30s ease-in-out infinite alternate}
+html[data-lt="1"] .tbg i:nth-child(2){width:42vmax;height:42vmax;right:-22vmax;left:auto;top:auto;bottom:6vh;background:color-mix(in srgb,#fff 35%,var(--b2,var(--acc)));animation:tlb2 34s ease-in-out infinite alternate}
+html[data-lt="1"] .tbg i:nth-child(3){width:40vmax;height:40vmax;left:30vw;bottom:-30vmax;background:color-mix(in srgb,#F6D68A 45%,var(--b3,var(--acc)));animation:tlb3 38s ease-in-out infinite alternate}
+@keyframes tlb1{to{transform:translate(5vmax,-4vmax) scale(1.08)}}
+@keyframes tlb2{to{transform:translate(-4vmax,-5vmax) scale(.95)}}
+@keyframes tlb3{to{transform:translate(6vmax,-3vmax) scale(1.1)}}
+/* aurora: gentler, and faded out around the middle/top so it can't sit behind the scramble */
+html[data-lt="1"] .taur{opacity:.28;filter:blur(70px);
+  -webkit-mask-image:linear-gradient(to top,#000 0,rgba(0,0,0,.6) 28%,transparent 58%);mask-image:linear-gradient(to top,#000 0,rgba(0,0,0,.6) 28%,transparent 58%)}
+/* keep a bright, airy wash at the top */
+html[data-lt="1"] .tbg::before{background:radial-gradient(60% 55% at 50% -4%,rgba(255,255,255,.95),rgba(255,255,255,0) 75%),radial-gradient(70% 36% at 50% 104%,color-mix(in srgb,var(--acc) 20%,transparent),transparent 80%)}
+html[data-lt="1"] .tbg::after{background:radial-gradient(80% 70% at 50% 40%,transparent 55%,color-mix(in srgb,var(--acc) 8%,var(--bg)) 100%)}
+html[data-lt="1"] .tgrid{opacity:.45}
+@media (prefers-reduced-motion:reduce){html[data-lt="1"] .tbg i{animation:none!important}}
+
 </style>
 </head>
 <body>
@@ -718,7 +809,7 @@ C,cat,cabin,cucumber</pre>
 </div></div>
 
 <div class="ov" id="timer" role="dialog" aria-label="Timer">
-<div class="tbg" aria-hidden="true"><i></i><i></i><i></i><div class="tgrid"></div><div class="tdots"></div></div>
+<div class="tbg" aria-hidden="true"><i></i><i></i><i></i><div class="taur"></div><div class="tstars"></div><div class="tgrid"></div><div class="tdots"></div><div class="tgrain"></div></div>
 <button class="tclose" data-close type="button" aria-label="Close timer">Close</button>
 <div class="tpage" id="tpage">
 <div id="tmsc" class="tmsc"></div>
@@ -1727,7 +1818,14 @@ tcEl.addEventListener('dblclick',()=>{
   for(let i=0;i<18;i++){
     const b=document.createElement('b'),sz=10+Math.random()*16,dur=24+Math.random()*22;
     b.style.cssText='left:'+(Math.random()*98).toFixed(1)+'%;width:'+sz.toFixed(0)+'px;height:'+sz.toFixed(0)+'px;background:'+pal[Math.random()*6|0]+';--o:'+(.16+Math.random()*.2).toFixed(2)+';animation-duration:'+dur.toFixed(1)+'s;animation-delay:-'+(Math.random()*dur).toFixed(1)+'s';
+    b.style.filter='blur('+(sz<14?0:Math.random()*1.6).toFixed(1)+'px)';
     box.appendChild(b);
+  }
+  const st=$('.tstars');
+  for(let i=0;i<70;i++){
+    const d=document.createElement('b'),sz=1+Math.random()*1.8;
+    d.style.cssText='left:'+(Math.random()*100).toFixed(1)+'%;top:'+(Math.random()*78).toFixed(1)+'%;width:'+sz.toFixed(1)+'px;height:'+sz.toFixed(1)+'px;--o:'+(.25+Math.random()*.6).toFixed(2)+';animation-duration:'+(3+Math.random()*6).toFixed(1)+'s;animation-delay:-'+(Math.random()*9).toFixed(1)+'s';
+    st.appendChild(d);
   }
 })();
 
