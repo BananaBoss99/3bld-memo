@@ -429,9 +429,9 @@ body.ready #top button:nth-child(5){animation-delay:.33s}
 .tmsc small{font-size:.72em;margin-left:.06em;color:var(--acc);font-weight:600}
 @keyframes mv{from{opacity:0;transform:translateY(10px)}}
 .tmmain{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%}
-.tmt{font-size:clamp(4.6rem,21vw,12rem);font-weight:600;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:.015em;transition:color .15s}
+.tmt{font-size:clamp(4.6rem,21vw,12rem);font-weight:600;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:.015em}
 .tmline{width:min(380px,62vw);height:3px;border-radius:2px;background:var(--line);overflow:hidden;margin-top:1.6rem}
-#tmbar{display:block;height:100%;width:0;background:var(--r);transition:width .3s linear,background-color .15s,opacity .3s}
+#tmbar{display:block;height:100%;width:0;background:var(--r)}
 .tpage.hold #tmbar{width:100%}
 .tpage.ready #tmbar{width:100%;background:var(--g)}
 .tpage.run #tmbar{width:100%;background:var(--acc);opacity:.3}
@@ -462,6 +462,7 @@ html[data-lt="1"] .tbg i{opacity:.5}
 .tdots b{position:absolute;bottom:-40px;border-radius:4px;opacity:0;animation:tfl linear infinite}
 @keyframes tfl{0%{opacity:0;transform:translateY(0) rotate(0)}10%{opacity:var(--o)}85%{opacity:var(--o)}100%{opacity:0;transform:translateY(-115vh) rotate(220deg)}}
 .tbg::after{content:"";position:absolute;inset:0;background:radial-gradient(70% 60% at 50% 45%,transparent 38%,color-mix(in srgb,var(--bg) 72%,transparent) 100%)}
+.tmt{contain:layout style;will-change:contents}
 @media (prefers-reduced-motion:reduce){.tbg i,.tgrid,.tdots b{animation:none!important}}
 
 /* ---------- 3D scramble cube ---------- */
@@ -472,7 +473,7 @@ html[data-lt="1"] .tbg i{opacity:.5}
 @keyframes tcbob{50%{transform:translateY(-6px)}}
 .tc3d{position:relative;width:var(--cs);height:var(--cs);transform-style:preserve-3d;will-change:transform}
 .tcshadow{position:absolute;left:50%;bottom:3%;width:62%;height:11%;margin-left:-31%;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.45),transparent);filter:blur(7px)}
-.tf{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:calc(var(--cs) * .007);padding:calc(var(--cs) * .004);background:#2d2d33;border-radius:calc(var(--cs) * .04);backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.tf{position:absolute;inset:0;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:calc(var(--cs) * .007);padding:calc(var(--cs) * .004);background:#2d2d33;border-radius:calc(var(--cs) * .06);backface-visibility:hidden;-webkit-backface-visibility:hidden}
 .tf::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(65% 65% at var(--gx,30%) var(--gy,20%),rgba(255,255,255,var(--gi,.06)),transparent 75%),linear-gradient(rgba(0,0,0,var(--gd,.1)),rgba(0,0,0,var(--gd,.1)))}
 .tcore{position:absolute;inset:0;transform-style:preserve-3d;pointer-events:none}
 .tcore b{position:absolute;inset:0;background:#2d2d33;backface-visibility:hidden;-webkit-backface-visibility:hidden;--z:calc(var(--cs) * .485)}
@@ -483,7 +484,7 @@ html[data-lt="1"] .tbg i{opacity:.5}
 .tcore b:nth-child(5){transform:rotateX(90deg) translateZ(var(--z))}
 .tcore b:nth-child(6){transform:rotateX(-90deg) translateZ(var(--z))}
 .tf i.gan{position:relative}
-.tf i.gan::after{content:"";position:absolute;inset:0;background:var(--cap-logo) center/64% no-repeat}
+.tf i.gan::after{content:"";position:absolute;inset:0;background:var(--cap-logo) center/64% no-repeat;transform:rotate(var(--lr,0deg))}
 .tf i{border-radius:calc(var(--cs) * .03);background:radial-gradient(120% 90% at 26% 8%,rgba(255,255,255,.2),rgba(255,255,255,0) 55%),linear-gradient(155deg,rgba(255,255,255,.13),rgba(255,255,255,0) 45%,rgba(0,0,0,.1)),var(--c);box-shadow:inset 0 0 0 .5px rgba(0,0,0,.2),inset 0 calc(var(--cs) * .004) calc(var(--cs) * .006) rgba(255,255,255,.3),inset 0 calc(var(--cs) * -.01) calc(var(--cs) * .02) rgba(0,0,0,.12);animation:tspop .5s cubic-bezier(.34,1.56,.64,1) backwards;animation-delay:calc(var(--k) * 16ms)}
 @keyframes tspop{from{transform:scale(0);opacity:0}}
 .tf-f{transform:translateZ(calc(var(--cs) / 2))}
@@ -492,6 +493,27 @@ html[data-lt="1"] .tbg i{opacity:.5}
 .tf-l{transform:rotateY(-90deg) translateZ(calc(var(--cs) / 2))}
 .tf-u{transform:rotateX(90deg) translateZ(calc(var(--cs) / 2))}
 .tf-d{transform:rotateX(-90deg) translateZ(calc(var(--cs) / 2))}
+.tc3d.np .tf i{animation:none}
+.tc3d.done .cb{will-change:auto}
+/* scramble playback cube: 26 real cubies so layers can actually turn */
+.tcb{--s:calc(var(--cs) / 3);position:absolute;inset:0;transform-style:preserve-3d;pointer-events:none}
+.cb{will-change:transform;position:absolute;left:50%;top:50%;width:var(--s);height:var(--s);margin:calc(var(--s) / -2) 0 0 calc(var(--s) / -2);transform-style:preserve-3d}
+.cf{position:absolute;inset:0;border-radius:calc(var(--s) * .18);background:#2d2d33;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.cf-f{transform:translateZ(calc(var(--s) / 2))}
+.cf-b{transform:rotateY(180deg) translateZ(calc(var(--s) / 2))}
+.cf-r{transform:rotateY(90deg) translateZ(calc(var(--s) / 2))}
+.cf-l{transform:rotateY(-90deg) translateZ(calc(var(--s) / 2))}
+.cf-u{transform:rotateX(90deg) translateZ(calc(var(--s) / 2))}
+.cf-d{transform:rotateX(-90deg) translateZ(calc(var(--s) / 2))}
+.cc{position:absolute;inset:6%;background:#2d2d33;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.cc-f{transform:translateZ(calc(var(--s) * .44))}
+.cc-b{transform:rotateY(180deg) translateZ(calc(var(--s) * .44))}
+.cc-r{transform:rotateY(90deg) translateZ(calc(var(--s) * .44))}
+.cc-l{transform:rotateY(-90deg) translateZ(calc(var(--s) * .44))}
+.cc-u{transform:rotateX(90deg) translateZ(calc(var(--s) * .44))}
+.cc-d{transform:rotateX(-90deg) translateZ(calc(var(--s) * .44))}
+.cf .st{position:absolute;inset:1.6%;border-radius:calc(var(--cs) * .03);background:radial-gradient(195% 195% at var(--gx,30%) var(--gy,20%),rgba(255,255,255,var(--gi,.06)),transparent 75%),linear-gradient(rgba(0,0,0,var(--gd,.1)),rgba(0,0,0,var(--gd,.1))),radial-gradient(120% 90% at 26% 8%,rgba(255,255,255,.2),rgba(255,255,255,0) 55%),linear-gradient(155deg,rgba(255,255,255,.13),rgba(255,255,255,0) 45%,rgba(0,0,0,.1)),var(--c);box-shadow:inset 0 0 0 .5px rgba(0,0,0,.2),inset 0 calc(var(--cs) * .004) calc(var(--cs) * .006) rgba(255,255,255,.3),inset 0 calc(var(--cs) * -.01) calc(var(--cs) * .02) rgba(0,0,0,.12)}
+.cf .st.gan::after{content:"";position:absolute;inset:0;background:var(--cap-logo) center/64% no-repeat}
 @media (min-width:900px){
   .tmmain{flex-direction:row;gap:clamp(2rem,6vw,6rem)}
   .tcube{--cs:clamp(190px,21vw,280px);margin-top:0}
@@ -1669,13 +1691,13 @@ const SCR=(function(){
 })();
 
 /* ---------- timer: a calm, minimal page ---------- */
-const TM={s:'idle',prev:'idle',t0:0,raf:0,holdTimer:0,scr:'',fb:false,building:false};
+const TM={s:'idle',prev:'idle',t0:0,raf:0,holdTimer:0,scr:'',fb:false,building:false,next:'',pre:0,newT:0};
 const TM_HINT=matchMedia('(pointer:coarse)').matches?'Press and hold, release when green':'Hold Space until green, release to start';
 function tfmt(ms){const c=Math.floor(ms/10),cs=c%100,sec=Math.floor(c/100),m=Math.floor(sec/60);return(m?m+':'+String(sec%60).padStart(2,'0'):String(sec))+'.'+String(cs).padStart(2,'0')}
 const tmClass=c=>{$('#tpage').className='tpage '+(c||'')};
 const tmHint=t=>{$('#tmh').textContent=t};
-function tmShowScr(){
-  tcRender();
+function tmShowScr(anim){
+  if(anim)tcAnimate(TM.scr);else tcRender();
   $('#tmsc').innerHTML=TM.scr.split(' ').map((m,i)=>'<span style="--i:'+i+'">'+m[0]+(m.length>1?(m[1]==="'"?'<small class="pr">′</small>':'<small class="dbl">'+m.slice(1)+'</small>'):'')+'</span>').join('');
 }
 function tmNew(){
@@ -1686,9 +1708,14 @@ function tmNew(){
     tmHint('Getting ready\u2026');
     tmWarm();return;
   }
-  TM.scr=SCR.scramble();
-  tmShowScr();
+  TM.scr=TM.next||SCR.scramble();TM.next='';
+  tmShowScr(modal==='timer');
   if(TM.s==='idle'||TM.s==='stop')tmHint(TM_HINT);
+  tmPrefetch();
+}
+function tmPrefetch(){
+  clearTimeout(TM.pre);
+  TM.pre=setTimeout(()=>{if(TM.next||!SCR.ready||TM.s==='run'||modal!=='timer')return;TM.next=SCR.scramble()},700);
 }
 function tmWarm(){
   if(SCR.ready||TM.building)return;TM.building=true;
@@ -1696,12 +1723,14 @@ function tmWarm(){
 }
 /* build the scrambler tables in the background while the intro plays */
 setTimeout(tmWarm,50);
-function tmTick(){if(TM.s!=='run')return;$('#tmt').textContent=tfmt(performance.now()-TM.t0);TM.raf=requestAnimationFrame(tmTick)}
-function tmStart(){TM.s='run';TM.t0=performance.now();tmClass('run');tmHint('');snd('tstart');tmTick()}
+let tmtEl=null,tmtLast='';
+function tmTick(){if(TM.s!=='run')return;if(!tmtEl)tmtEl=$('#tmt');const t=tfmt(performance.now()-TM.t0);if(t!==tmtLast){tmtLast=t;tmtEl.textContent=t}TM.raf=requestAnimationFrame(tmTick)}
+function tmStart(){TM.s='run';tmtLast='';TM.t0=performance.now();clearTimeout(TM.pre);tmClass('run');tmHint('');tmTick();snd('tstart')}
 function tmStop(){
   const el=performance.now()-TM.t0;cancelAnimationFrame(TM.raf);
   TM.s='stop';$('#tmt').textContent=tfmt(el);tmClass('stop');tmHint(TM_HINT);snd('tstop');
-  setTimeout(tmNew,40);
+  clearTimeout(TM.newT);
+  requestAnimationFrame(()=>{TM.newT=setTimeout(()=>{if(TM.s==='stop'&&modal==='timer')tmNew()},120)});
 }
 function tmDown(){
   if(TM.s==='run'){tmStop();return}
@@ -1757,29 +1786,148 @@ function tcRot(v){
 }
 function tcApply(){
   const el=$('#tc3d');el.style.transform='rotateX('+TC.rx+'deg) rotateY('+TC.ry+'deg)';
+  if(TC.gl){TC.gl();return}
   /* Cache face nodes after each scramble render; querying the subtree on every drag frame
      forces extra main-thread work and can make rotation feel sticky. */
   /* live UV gloss: light stays fixed, highlights slide across the faces as the cube turns */
-  TC.faces.forEach(({f,k})=>{
-    const n=tcRot(TC_N[k]),u=tcRot(TC_UV[k][0]),v=tcRot(TC_UV[k][1]);
+  TC.faces.forEach(o=>{
+    const f=o.f,k=o.k,n=tcRot(TC_N[k]);
+    if(n[2]<-.25)return; /* facing away: invisible, so no repaint needed */
+    const u=tcRot(TC_UV[k][0]),v=tcRot(TC_UV[k][1]);
     const diff=Math.max(0,tcDot(n,TC_L)),spec=Math.pow(Math.max(0,tcDot(n,TC_H)),9);
-    f.style.setProperty('--gi',(.06+.3*spec).toFixed(3));
-    f.style.setProperty('--gd',(.2*(1-diff)).toFixed(3));
-    f.style.setProperty('--gx',(50+55*tcDot(TC_L,u)).toFixed(1)+'%');
-    f.style.setProperty('--gy',(50+55*tcDot(TC_L,v)).toFixed(1)+'%');
+    const gi=(.06+.3*spec).toFixed(2),gd=(.2*(1-diff)).toFixed(2),gx=Math.round(50+55*tcDot(TC_L,u)),gy=Math.round(50+55*tcDot(TC_L,v));
+    const sig=gi+'|'+gd+'|'+gx+'|'+gy;
+    if(o.sig===sig)return;o.sig=sig;
+    f.style.setProperty('--gi',gi);
+    f.style.setProperty('--gd',gd);
+    f.style.setProperty('--gx',gx+'%');
+    f.style.setProperty('--gy',gy+'%');
   });
 }
-function tcRender(){
+function tcRender(np){
+  tcStop();
+  /* the white centre cap turns with every U move, so the logo ends up twisted exactly like a real cube */
+  let lr=0;String(TM.scr||'').split(/\s+/).forEach(t=>{if(t[0]==='U')lr+=t[1]==="'"?-90:t[1]==='2'?180:90});lr=((lr%360)+360)%360;
   const f=SCR.facelets(SCR.apply(TM.scr||''));let h='';
   for(let fi=0;fi<6;fi++){
     h+='<div class="tf tf-'+TC_FACE[fi]+'">';
-    for(let k=0;k<9;k++)h+='<i'+(fi===0&&k===4?' class="gan"':'')+' style="--c:'+TC_COL[f[fi*9+k]]+';--k:'+(fi*4+k)+'"></i>';
+    for(let k=0;k<9;k++)h+='<i'+(fi===0&&k===4?' class="gan"':'')+' style="--c:'+TC_COL[f[fi*9+k]]+';--k:'+(fi*4+k)+';--lr:'+lr+'deg"></i>';
     h+='</div>';
   }
   h+='<div class="tcore"><b></b><b></b><b></b><b></b><b></b><b></b></div>';
-  const cube=$('#tc3d');cube.innerHTML=h;
+  const cube=$('#tc3d');cube.innerHTML=h;cube.classList.remove('done');cube.classList.toggle('np',!!np);
   TC.faces=Array.from(cube.querySelectorAll('.tf'),f=>({f,k:f.className.slice(-1)}));
   tcApply();
+}
+/* ---------- scramble playback: turn the cube out from solved, move by move ---------- */
+const tcRnd=m=>m.map(r=>r.map(v=>Math.round(v)));
+const tcMul=(A,B)=>A.map((r,i)=>[0,1,2].map(j=>r[0]*B[0][j]+r[1]*B[1][j]+r[2]*B[2][j]));
+const tcMv=(A,v)=>A.map(r=>Math.round(r[0]*v[0]+r[1]*v[1]+r[2]*v[2]));
+function tcRod(n,deg){
+  const a=deg*Math.PI/180,c=Math.cos(a),s=Math.sin(a),x=n[0],y=n[1],z=n[2],t=1-c;
+  return [[c+x*x*t,x*y*t-z*s,x*z*t+y*s],[y*x*t+z*s,c+y*y*t,y*z*t-x*s],[z*x*t-y*s,z*y*t+x*s,c+z*z*t]];
+}
+const TC_I=[[1,0,0],[0,1,0],[0,0,1]];
+function tcBase(c,px){
+  const R=c.R,p=c.p0;
+  if(px)return 'matrix3d('+R[0][0]+','+R[1][0]+','+R[2][0]+',0,'+R[0][1]+','+R[1][1]+','+R[2][1]+',0,'+R[0][2]+','+R[1][2]+','+R[2][2]+',0,0,0,0,1) translate3d('+(px*p[0])+'px,'+(px*p[1])+'px,'+(px*p[2])+'px)';
+  return 'matrix3d('+R[0][0]+','+R[1][0]+','+R[2][0]+',0,'+R[0][1]+','+R[1][1]+','+R[2][1]+',0,'+R[0][2]+','+R[1][2]+','+R[2][2]+',0,0,0,0,1) translate3d(calc(var(--s) * '+p[0]+'),calc(var(--s) * '+p[1]+'),calc(var(--s) * '+p[2]+'))';
+}
+function tcStop(){TC.anim=(TC.anim||0)+1;cancelAnimationFrame(TC.animRaf);TC.gl=null;TC.gs=null}
+/* live gloss for the playback cube: lighting is worked out from each sticker's real, current
+   orientation and position (including the turn in progress and the swing-in), so it never steps or lags */
+function tcGlossAnim(){
+  const g=TC.gs;if(!g)return;
+  const a=g.sw*Math.PI/180,ca=Math.cos(a),sa=Math.sin(a);
+  const V=v=>tcRot([v[0]*ca+v[2]*sa,v[1],-v[0]*sa+v[2]*ca]);
+  const mv=(M,v)=>[M[0][0]*v[0]+M[0][1]*v[1]+M[0][2]*v[2],M[1][0]*v[0]+M[1][1]*v[1]+M[1][2]*v[2],M[2][0]*v[0]+M[2][1]*v[1]+M[2][2]*v[2]];
+  g.cubies.forEach(c=>{
+    const Rm=g.M&&g.set.has(c)?tcMul(g.M,c.R):c.R,p=V(mv(Rm,c.p0));
+    c.st.forEach(o=>{
+      const n=V(mv(Rm,o.n0)),u=V(mv(Rm,o.u0)),w=V(mv(Rm,o.v0));
+      if(n[2]<-.25)return; /* facing away: invisible */
+      const nl=tcDot(n,TC_L),nh=tcDot(n,TC_H),pn=tcDot(p,n);
+      const d=[0,1,2].map(i=>1.65*(TC_L[i]-nl*n[i])-(p[i]-pn*n[i]));
+      const q4=(v,k)=>Math.round(v/k)*k;
+      const sig=q4(.06+.3*Math.pow(Math.max(0,nh),9),.02).toFixed(2)+'|'+q4(.2*(1-Math.max(0,nl)),.02).toFixed(2)+'|'+q4(50+100*tcDot(d,u),4)+'|'+q4(50+100*tcDot(d,w),4);
+      if(o.sig===sig)return;o.sig=sig;const q=sig.split('|'),st=o.f.style;
+      st.setProperty('--gi',q[0]);st.setProperty('--gd',q[1]);st.setProperty('--gx',q[2]+'%');st.setProperty('--gy',q[3]+'%');
+    });
+  });
+}
+function tcBuild(){
+  const cubies=[],stickers=[];let h='';
+  for(let x=-1;x<=1;x++)for(let y=-1;y<=1;y++)for(let z=-1;z<=1;z++){
+    if(!x&&!y&&!z)continue;
+    h+='<div class="cb">';
+    TC_FACE.forEach(k=>{h+='<div class="cc cc-'+k+'"></div>'});
+    TC_FACE.forEach(k=>{
+      const n=TC_N[k];h+='<div class="cf cf-'+k+'">';
+      if(x*n[0]+y*n[1]+z*n[2]===1)h+='<i class="st'+(k==='u'&&!x&&!z?' gan':'')+'" style="--c:'+TC_COL[k.toUpperCase()]+'"></i>';
+      h+='</div>';
+    });
+    h+='</div>';
+    cubies.push({p0:[x,y,z],p:[x,y,z],R:TC_I,center:Math.abs(x)+Math.abs(y)+Math.abs(z)===1});
+  }
+  const cube=$('#tc3d');cube.innerHTML='<div class="tcb">'+h+'</div>';cube.classList.remove('done');cube.classList.add('np');
+  const els=cube.querySelectorAll('.cb');
+  TC.px=cube.offsetWidth/3;
+  cubies.forEach((c,i)=>{
+    c.el=els[i];c.el.style.transform=tcBase(c,TC.px);c.st=[];
+    c.el.querySelectorAll('.cf').forEach((fe,j)=>{const s=fe.firstElementChild;if(s){const o={f:s,k:TC_FACE[j],n0:TC_N[TC_FACE[j]],u0:TC_UV[TC_FACE[j]][0],v0:TC_UV[TC_FACE[j]][1]};c.st.push(o);stickers.push(o)}});
+  });
+  TC.faces=stickers;TC.gs={cubies,M:null,set:null,sw:-70};TC.gl=tcGlossAnim;tcApply();
+  return cubies;
+}
+function tcAnimate(scr){
+  tcStop();
+  const toks=String(scr||'').split(/\s+/).filter(t=>t&&t.indexOf('w')<0&&TC_FACE.indexOf(t[0].toLowerCase())>-1);
+  if(!toks.length||matchMedia('(prefers-reduced-motion:reduce)').matches){tcRender(true);return}
+  const cubies=tcBuild(),id=TC.anim;
+  /* one continuous timeline: moves flow straight into each other with only a light ease,
+     so the cube keeps moving instead of stopping after every turn */
+  const mv=toks.map(t=>({n:TC_N[t[0].toLowerCase()],q:t[1]==="'"?-90:t[1]==='2'?180:90}));
+  let acc=0;mv.forEach(m=>{m.d=m.q===180?135:90;m.s=acc;acc+=m.d});
+  const total=acc;let cur=0,layer=null;
+  const pick=m=>cubies.filter(c=>c.p[0]*m.n[0]+c.p[1]*m.n[1]+c.p[2]*m.n[2]===1);
+  function bake(m){
+    const M=tcRod(m.n,m.q);
+    layer.forEach(c=>{
+      c.R=tcRnd(tcMul(M,c.R));c.p=tcMv(c.R,c.p0);c.el.style.transform=tcBase(c,TC.px);
+      c.st.forEach(o=>{const nn=tcMv(c.R,o.n0);o.k=TC_FACE.find(k=>{const v=TC_N[k];return v[0]===nn[0]&&v[1]===nn[1]&&v[2]===nn[2]})});
+    });
+    layer=null;
+  }
+  let fn=0;const t0=performance.now(),tcb=$('#tc3d .tcb');
+  (function frame(now){
+    if(TC.anim!==id)return;
+    const el=Math.max(0,now-t0);
+    /* gentle sweep: the whole cube swings in while it scrambles and settles on your view angle */
+    const g=Math.min(1,el/(total+60)),sw=1-g,ent=Math.min(1,el/220);
+    const swd=-70*sw*sw*sw;TC.gs.sw=swd;
+    tcb.style.transform='rotateY('+swd.toFixed(2)+'deg) scale('+(.9+.1*(1-Math.pow(1-ent,3))).toFixed(4)+')';
+    while(cur<mv.length&&el>=mv[cur].s+mv[cur].d){
+      if(!layer)layer=pick(mv[cur]);
+      bake(mv[cur]);cur++;
+    }
+    if(cur>=mv.length){
+      /* finish in place: keep the same cube (and the same per-sticker lighting) instead of swapping to a
+         differently-lit flat cube, which is what caused the visible jump in lighting */
+      tcb.style.transform='rotateY(0deg) scale(1)';
+      cubies.forEach(c=>{c.el.style.transform=tcBase(c)});
+      TC.gs.sw=0;TC.gs.M=null;TC.gs.set=null;tcGlossAnim();
+      $('#tc3d').classList.add('done');
+      return;
+    }
+    const m=mv[cur];if(!layer)layer=pick(m);
+    const p=Math.max(0,Math.min(1,(el-m.s)/m.d)),q1=p-1,e=.4*(p*p*(3-2*p))+.6*(1+1.9*q1*q1*q1+.9*q1*q1);
+    const ax=m.n[0]+','+m.n[1]+','+m.n[2]+',',a='rotate3d('+ax+(m.q*e).toFixed(3)+'deg) ';
+    layer.forEach(c=>{c.el.style.transform=a+tcBase(c,TC.px)});
+    TC.gs.M=tcRod(m.n,m.q*e);TC.gs.set=new Set(layer);
+    /* gloss is subtle: refresh it every 3rd frame instead of every frame to avoid repainting 50+ stickers constantly */
+    if(!(fn++%3))tcGlossAnim();
+    TC.animRaf=requestAnimationFrame(frame);
+  })(t0);
 }
 const tcEl=$('#tcube');
 tcEl.addEventListener('pointerdown',e=>{
