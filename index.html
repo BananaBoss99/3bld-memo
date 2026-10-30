@@ -24,7 +24,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 #pair.idle{font-size:clamp(1.1rem,4vw,1.6rem);font-weight:400;color:var(--muted);letter-spacing:.05em;white-space:normal}
 #pair.run{text-shadow:0 0 .35em color-mix(in srgb,var(--acc) 55%,transparent),0 0 1em color-mix(in srgb,var(--acc) 30%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--acc) 35%,transparent),0 0 40px color-mix(in srgb,var(--acc) 18%,transparent)}
 #pair.hid{opacity:0}
-#pair.run{transition:none}
+#pair.run{transition:opacity .12s ease-out}
 #pair span{margin-right:-.15em}
 .danger{border-color:#DC2626;color:#DC2626}
 .danger.solid{background:#DC2626;color:#fff;border-color:#DC2626;font-weight:600}
@@ -67,8 +67,8 @@ textarea{width:100%;height:7rem;font-size:.75rem;user-select:text;-webkit-user-s
 #toast{position:fixed;bottom:3rem;left:50%;background:var(--panel);border:1px solid var(--line);padding:.5em 1em;border-radius:6px;font-size:.85rem;opacity:0;pointer-events:none;z-index:9}
 #toast.on{opacity:1}
 .ov.out{display:flex;pointer-events:none}
-#word.pop{animation:wp .15s ease-out}
-@keyframes wp{from{opacity:0;transform:translateY(-6px)}}
+#word.pop{animation:wp .24s cubic-bezier(.2,.7,.25,1)}
+@keyframes wp{from{opacity:0;transform:translateY(9px);filter:blur(3px)}}
 html[data-bg=oled]{--bg:#000;--panel:#0A0A0A;--line:#1F1F1F}
 :root{--g:#4ADE80;--y:#FBBF24;--r:#F87171}
 html[data-lt="1"]{color-scheme:light;--fg:#1C1B1A;--muted:#6B6560;--g:#15803D;--y:#B45309;--r:#B91C1C}
@@ -777,9 +777,9 @@ body.solving #top:hover{opacity:1}
 /* ---------- upgrades: DNF, result pop, calmer background while solving ---------- */
 .tmt.dnf{color:var(--r);animation:tmshake .45s ease}
 @keyframes tmshake{0%,100%{transform:none}20%{transform:translateX(-9px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(2px)}}
-#time.r0,#time.r1,#time.r2,#time.done{animation:tpop .45s cubic-bezier(.34,1.56,.64,1)}
+#time.r0,#time.r1,#time.r2,#time.done{animation:tpop .26s cubic-bezier(.2,.7,.25,1)}
 #time.failed{animation:tmshake .45s ease}
-@keyframes tpop{from{opacity:0;transform:scale(.88) translateY(4px)}}
+@keyframes tpop{from{opacity:0;transform:scale(.95) translateY(3px)}}
 .tbg{transition:opacity .9s ease}
 #timer:has(.tpage.run) .tbg{opacity:.55}
 #timer:has(.tpage.run) .tbg,#timer:has(.tpage.run) .tbg *,#timer:has(.tpage.run) .tbg *::before,#timer:has(.tpage.run) .tbg::before{animation-play-state:paused!important}
@@ -900,6 +900,181 @@ html[data-bg=meadow] #idlefx i,html[data-bg=light] #idlefx i{display:block;backg
 #cword{display:none;width:100%;margin:.2rem 0 .9rem;padding:.6rem .75rem;border-radius:10px;border:1px solid var(--line);background:color-mix(in srgb,var(--bg) 60%,transparent);color:var(--fg);font:inherit;letter-spacing:.06em}
 #cword:focus{outline:none;border-color:var(--r)}
 #cyes:disabled{opacity:.35;cursor:not-allowed}
+
+/* ---------- practice polish: staggered letters, glow flare, result tint, ghost of previous pair ---------- */
+:root{--sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;--rc:8px;--ease:cubic-bezier(.2,.7,.25,1)}
+#pair{position:relative}
+#pair.run span{animation:letIn .22s var(--ease) both;animation-delay:calc(min(var(--i,0),4) * 26ms)}
+@keyframes letIn{from{opacity:.55;transform:translateY(6px) scale(.95)}}
+#pair.run::after{content:"";position:absolute;inset:-12%;border-radius:inherit;pointer-events:none;background:radial-gradient(closest-side,color-mix(in srgb,var(--acc) 20%,transparent),transparent);opacity:0;animation:pairFlare .7s ease-out}
+@keyframes pairFlare{0%{opacity:1;transform:scale(.9)}100%{opacity:0;transform:scale(1.1)}}
+#pair.rs{animation:pairRes .6s ease-out}
+@keyframes pairRes{0%{color:var(--rc2);text-shadow:0 0 .4em color-mix(in srgb,var(--rc2) var(--rca,45%),transparent)}100%{text-shadow:0 0 0 transparent}}
+@media(prefers-reduced-motion:reduce){#pair.run span,#pair.run::after,#pair.rs{animation:none!important}}
+
+/* ---------- type: instrument = mono, explanation = proportional ---------- */
+.fn,.box p,.box li,#tip,#toast{font-family:var(--sans)}
+.box kbd{font-family:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;font-size:.9em}
+
+/* ---------- controls: one radius, one focus treatment ---------- */
+button,input[type=number],select,textarea,.btnlike,pre{border-radius:var(--rc)}
+.chips button,.tl button{border-radius:var(--rc)}
+button,.btnlike{transition:border-color .18s,background-color .18s,color .18s,box-shadow .2s,transform .12s}
+button:focus-visible,.btnlike:focus-visible{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px color-mix(in srgb,var(--acc) 26%,transparent)}
+#top button:focus-visible{border-color:transparent}
+
+/* ---------- overlays ---------- */
+.box{overscroll-behavior:contain}
+
+/* ---------- clock: same glass pill as the icon bar ---------- */
+#sclk{left:.6rem;border-radius:16px;background:color-mix(in srgb,var(--panel) 55%,transparent);border:1px solid color-mix(in srgb,var(--line) 75%,transparent);-webkit-backdrop-filter:blur(14px) saturate(1.3);backdrop-filter:blur(14px) saturate(1.3);transition:color .18s,opacity .6s ease,background-color .25s}
+#sclk:hover{background:color-mix(in srgb,var(--acc) 14%,color-mix(in srgb,var(--panel) 55%,transparent))}
+body.solving #sclk{opacity:.3}
+body.solving #sclk:hover{opacity:1}
+
+/* ---------- idle: faint last result ---------- */
+#time.last{font-size:clamp(.8rem,2.6vw,.95rem);font-weight:400;letter-spacing:.1em;opacity:.5;animation:sin .5s var(--ease) backwards}
+
+/* ---------- light themes: softer glow so it doesn't smudge dark text ---------- */
+html[data-lt="1"]{--rca:26%}
+html[data-lt="1"] #pair.run{text-shadow:0 0 .28em color-mix(in srgb,var(--acc) 22%,transparent),0 0 .9em color-mix(in srgb,var(--acc) 9%,transparent);box-shadow:0 0 0 1px color-mix(in srgb,var(--acc) 28%,transparent),0 8px 40px color-mix(in srgb,var(--acc) 9%,transparent)}
+html[data-lt="1"] #pair.run::after{background:radial-gradient(closest-side,color-mix(in srgb,var(--acc) 11%,transparent),transparent)}
+
+/* ---------- word grid ---------- */
+#grid .box{width:min(1180px,100%);display:flex;flex-direction:column;overflow:hidden;padding:1.2rem 1.2rem 1rem}
+#grid .box h2{flex:none}
+.gtop{flex:none;display:flex;flex-wrap:wrap;gap:.5rem 1rem;align-items:center;justify-content:space-between;margin:0 0 .75rem}
+.gtop .mut{font-family:var(--sans);flex:1 1 18rem;line-height:1.5}
+.gcount{white-space:nowrap;font-size:.72rem;color:var(--acc);border:1px solid color-mix(in srgb,var(--acc) 28%,var(--line));border-radius:999px;padding:.35rem .7rem;font-variant-numeric:tabular-nums}
+#gzo,#gzi{width:2rem;height:2rem;padding:0;line-height:1}
+#gzo:disabled,#gzi:disabled{opacity:.35;pointer-events:none}
+.gscroll{position:relative;flex:1;min-height:0;overflow:auto;border:1px solid var(--line);border-radius:14px;background:color-mix(in srgb,var(--bg) 50%,var(--panel));overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+#gt{--cw:6.4rem;--ch:2.05rem;--cf:.78rem;border-collapse:separate;border-spacing:0;font-size:var(--cf)}
+#gt th{position:sticky;z-index:2;background:var(--panel);color:var(--acc);font-weight:700;font-size:calc(var(--cf) + .08rem);text-align:center;letter-spacing:.06em;text-shadow:0 0 .55em color-mix(in srgb,var(--acc) 65%,transparent),0 0 1.3em color-mix(in srgb,var(--acc) 30%,transparent);transition:color .15s,background-color .15s,text-shadow .2s}
+#gt thead th{top:0;height:var(--ch);min-width:var(--cw);border-bottom:1px solid var(--line);border-right:1px solid color-mix(in srgb,var(--line) 55%,transparent)}
+#gt tbody th{left:0;min-width:2.3rem;width:2.3rem;border-right:1px solid var(--line);border-bottom:1px solid color-mix(in srgb,var(--line) 55%,transparent)}
+#gt thead th.gcorner{left:0;z-index:3;min-width:2.3rem;width:2.3rem;border-right:1px solid var(--line)}
+#gt th.hl{background:color-mix(in srgb,var(--acc) 16%,var(--panel));text-shadow:0 0 .45em var(--acc),0 0 1.1em color-mix(in srgb,var(--acc) 60%,transparent),0 0 2em color-mix(in srgb,var(--acc) 30%,transparent)}
+html[data-lt="1"] #gt th{text-shadow:0 0 .5em color-mix(in srgb,var(--acc) 28%,transparent)}
+html[data-lt="1"] #gt th.hl{text-shadow:0 0 .6em color-mix(in srgb,var(--acc) 45%,transparent)}
+#gt td{padding:0;min-width:var(--cw);width:var(--cw);height:var(--ch);border-right:1px solid color-mix(in srgb,var(--line) 55%,transparent);border-bottom:1px solid color-mix(in srgb,var(--line) 55%,transparent);transition:background-color .2s}
+#gt td.dg{background:color-mix(in srgb,var(--line) 38%,transparent)}
+#gt td.f{background:color-mix(in srgb,var(--acc) 7%,transparent)}
+#gt td.f.dg{background:color-mix(in srgb,var(--acc) 7%,color-mix(in srgb,var(--line) 38%,transparent))}
+#gt td input{display:block;width:100%;height:100%;margin:0;border:0;border-radius:0;background:transparent;padding:0 .55rem;font-size:var(--cf);text-transform:lowercase;text-overflow:ellipsis;box-shadow:none;outline:none;transition:none}
+#gt td input:focus{border:0;box-shadow:inset 0 0 0 2px var(--acc);background:color-mix(in srgb,var(--acc) 11%,var(--panel));text-overflow:clip}
+#gt td.gf{animation:gflash 1.4s ease-out}
+@keyframes gflash{from{background:color-mix(in srgb,var(--acc) 45%,transparent)}}
+@media(max-width:700px){#grid .box{padding:1rem .8rem .8rem}}
+@media(pointer:coarse){#gt td input{font-size:16px}}
+@media(prefers-reduced-motion:reduce){#gt td.gf{animation:none}}
+#gt th[data-r],#gt th[data-c]{cursor:pointer}
+#gt th[data-r]:hover,#gt th[data-c]:hover{background:color-mix(in srgb,var(--acc) 12%,var(--panel))}
+#gt th.sel{background:color-mix(in srgb,var(--acc) 26%,var(--panel));box-shadow:inset 0 -2px 0 var(--acc);text-shadow:0 0 .4em var(--acc),0 0 1em var(--acc),0 0 2em color-mix(in srgb,var(--acc) 55%,transparent)}
+#gt tbody th.sel{box-shadow:inset -2px 0 0 var(--acc)}
+#gt td.gs{box-shadow:inset 0 0 0 9999px color-mix(in srgb,var(--acc) 9%,transparent)}
+
+/* ---------- top bar hover: every icon gets its own motion ---------- */
+@media(hover:hover){
+  #top #bh:hover svg{transform:rotate(10deg) scale(1.15)}
+  #top #bg:hover svg{transform:rotate(90deg) scale(1.12)}
+  #top #bs:hover svg{transform:scale(1.1);transform-origin:50% 50%}
+  #top #bs:hover svg path{animation:barGrow .55s cubic-bezier(.34,1.56,.64,1) backwards}
+  #top #bs:hover svg path:nth-child(2){animation-delay:.06s}
+  #top #bs:hover svg path:nth-child(3){animation-delay:.12s}
+}
+#top #bs svg path{transform-box:fill-box;transform-origin:50% 100%}
+@keyframes barGrow{from{transform:scaleY(.25)}}
+@media(prefers-reduced-motion:reduce){#top #bs:hover svg path{animation:none}}
+
+/* ---------- stats drawer ---------- */
+#drawer .box{width:min(480px,100%)}
+.seg{display:flex;gap:.25rem;padding:.25rem;border:1px solid var(--line);border-radius:12px;background:color-mix(in srgb,var(--bg) 50%,var(--panel));margin:.1rem 0 1rem}
+.seg button{flex:1;border:0;border-radius:9px;padding:.5em .4em;color:var(--muted);font-size:.85rem}
+.seg button:hover{color:var(--fg);transform:none}
+.seg button.on{background:var(--acc);color:var(--on);font-weight:600}
+.stblk{animation:sin .45s var(--ease) backwards;animation-delay:calc(var(--i,0) * 45ms)}
+.stblk h3{margin:1.3rem 0 .55rem}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:.55rem}
+.tile{background:color-mix(in srgb,var(--bg) 50%,var(--panel));border:1px solid var(--line);border-radius:14px;padding:.7rem .85rem;min-width:0}
+.tile>span{display:block;font-family:var(--sans);font-size:.68rem;color:var(--muted);letter-spacing:.07em;text-transform:uppercase}
+.tile b{display:block;font-size:1.35rem;font-weight:600;margin-top:.15rem;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile small{display:block;font-family:var(--sans);font-size:.7rem;color:var(--muted);margin-top:.1rem}
+.sbar{display:flex;height:10px;border-radius:999px;overflow:hidden;background:var(--line)}
+.sbar i{display:block;height:100%;transform-origin:left;animation:growX .6s var(--ease) backwards}
+@keyframes growX{from{transform:scaleX(0)}}
+.slg{display:flex;flex-wrap:wrap;gap:.3rem .9rem;margin-top:.5rem;font-size:.75rem;color:var(--muted)}
+.slg b{display:inline-block;width:.6rem;height:.6rem;border-radius:50%;margin-right:.35rem;vertical-align:-.05rem}
+.spark{display:block;width:100%;height:auto;overflow:visible}
+.spark .cl{fill:none;stroke:var(--acc);stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round;opacity:.85}
+.spark .cth{stroke:var(--muted);stroke-width:.7;stroke-dasharray:3 3;opacity:.4}
+.spark .ctx{fill:var(--muted);font-size:7.5px;font-family:'JetBrains Mono',monospace;opacity:.8}
+.spark .cd0{fill:var(--g)}.spark .cd1{fill:var(--y)}.spark .cd2{fill:var(--r)}
+.dcols,.hist,.lcols{display:flex;align-items:stretch;gap:3px;height:112px}
+.dcol,.hcol,.lcol{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:2px}
+.dcol em,.hcol em{font-style:normal;font-size:.62rem;color:var(--muted);height:.9rem;line-height:.9rem}
+.dtrack{flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center}
+.dbar{width:78%;min-height:2px;border-radius:4px 4px 2px 2px;background:var(--acc);opacity:.85;transform-origin:bottom;animation:growY .6s var(--ease) backwards;animation-delay:calc(var(--d,0) * 28ms)}
+.dcol.now .dbar{opacity:1;box-shadow:0 0 12px color-mix(in srgb,var(--acc) 55%,transparent)}
+.dbar.r0{background:var(--g)}.dbar.r1{background:var(--y)}.dbar.r2{background:var(--r)}.dbar.rn{background:var(--line)}
+@keyframes growY{from{transform:scaleY(0)}}
+.dcol i,.hcol i,.lcol i{font-style:normal;font-size:.62rem;color:var(--muted);height:.9rem;line-height:.9rem}
+.dcol.now i{color:var(--acc);font-weight:600}
+.lcols{height:84px;gap:2px}
+.lcol[data-dl]{cursor:pointer}
+.lcol[data-dl]:hover .dbar{filter:brightness(1.25)}
+.lcol[data-dl]:hover i{color:var(--acc)}
+.trend{display:flex;align-items:center;justify-content:space-between;gap:.6rem;border:1px solid var(--line);border-radius:14px;padding:.75rem .9rem;background:color-mix(in srgb,var(--bg) 50%,var(--panel))}
+.trend span{display:block;font-family:var(--sans);font-size:.68rem;color:var(--muted);letter-spacing:.07em;text-transform:uppercase}
+.trend b{font-size:1.15rem;font-weight:600;font-variant-numeric:tabular-nums}
+.trend .arr{font-weight:600;font-size:1rem}
+.pchips{display:flex;flex-wrap:wrap;gap:.35rem}
+.pchip{border:1px solid var(--line);border-radius:8px;padding:.25em .55em;font-size:.82rem;font-weight:600;letter-spacing:.08em;background:color-mix(in srgb,var(--bg) 50%,var(--panel))}
+.pchip small{color:var(--muted);font-weight:400;letter-spacing:0}
+#drawer .drillbtn{margin:.1rem 0 .6rem}
+@media(prefers-reduced-motion:reduce){.stblk,.sbar i,.dbar{animation:none}}
+
+/* ---------- top bar: every icon animates its own parts (these replace the whole-icon tilts) ---------- */
+#top #bd svg path{transform-box:view-box;transform-origin:12px 21px;transition:transform .5s cubic-bezier(.34,1.56,.64,1)}
+#top #bg svg path{transition:stroke-dasharray .5s cubic-bezier(.34,1.56,.64,1),transform .5s cubic-bezier(.34,1.56,.64,1)}
+#top #bg svg .t1{stroke-dasharray:8 4 99}
+#top #bg svg .t2{stroke-dasharray:5 4 99}
+#top #bg svg .t3{stroke-dasharray:11 4 99}
+#top #bt svg path:nth-child(2){transform-box:view-box;transform-origin:12px 13px}
+#top #bh svg path{stroke-dasharray:1}
+@keyframes linkA{0%{transform:none}35%{transform:translate(1.9px,-1.9px)}100%{transform:none}}
+@keyframes linkB{0%{transform:none}35%{transform:translate(-1.9px,1.9px)}100%{transform:none}}
+@keyframes handSpin{to{transform:rotate(360deg)}}
+@keyframes capPress{40%{transform:translateY(1.3px)}}
+@keyframes cubeSpin{to{transform:rotate(120deg)}}
+@keyframes lineDraw{from{stroke-dashoffset:1}}
+@media(hover:hover){
+  #top #bd:hover svg,#top #bch:hover svg,#top #bsl:hover svg,#top #bt:hover svg,#top #bh:hover svg,#top #bg:hover svg{transform:scale(1.1)}
+  /* lookup: the book opens */
+  #top #bd:hover svg path:first-child{transform:rotate(-8deg)}
+  #top #bd:hover svg path:last-child{transform:rotate(8deg)}
+  /* chain: the links tug apart and snap back */
+  #top #bch:hover svg path:first-child{animation:linkA .65s cubic-bezier(.34,1.56,.64,1)}
+  #top #bch:hover svg path:last-child{animation:linkB .65s cubic-bezier(.34,1.56,.64,1)}
+  /* trainers: the cube spins one face */
+  #top #bsl:hover svg path{transform-box:view-box;transform-origin:12px 12px;animation:cubeSpin .8s cubic-bezier(.45,.05,.2,1)}
+  /* timer: the hand sweeps a full turn, the crown presses */
+  #top #bt:hover svg path:nth-child(2){animation:handSpin .9s cubic-bezier(.45,.05,.2,1)}
+  #top #bt:hover svg path:nth-child(3){animation:capPress .4s ease}
+  /* heatmap: the grid lines draw in */
+  #top #bh:hover svg path{animation:lineDraw .5s ease backwards}
+  #top #bh:hover svg path:nth-child(3){animation-delay:.07s}
+  #top #bh:hover svg path:nth-child(4){animation-delay:.14s}
+  #top #bh:hover svg path:nth-child(5){animation-delay:.21s}
+  /* settings: the sliders slide */
+  #top #bg:hover svg .t1{stroke-dasharray:4 4 99}
+  #top #bg:hover svg .t2{stroke-dasharray:10 4 99}
+  #top #bg:hover svg .t3{stroke-dasharray:6 4 99}
+  #top #bg:hover svg .k1{transform:translateX(-4px)}
+  #top #bg:hover svg .k2{transform:translateX(5px)}
+  #top #bg:hover svg .k3{transform:translateX(-5px)}
+}
+@media(prefers-reduced-motion:reduce){#top button svg path{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
@@ -919,9 +1094,9 @@ html[data-bg=meadow] #idlefx i,html[data-bg=light] #idlefx i{display:block;backg
 <button id="bch" tabindex="-1" aria-label="Memo chain" title="Memo chain [C]"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button>
 <button id="bsl" tabindex="-1" aria-label="Trainers" title="Trainers: stickers and words [L]"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M12 12l9-5M12 12v10M12 12L3 7"/></svg></button>
 <button id="bt" tabindex="-1" aria-label="Timer" title="Timer [T]"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2"/><path d="M9.5 2h5"/></svg></button>
-<button id="bh" tabindex="-1" aria-label="Heatmap" title="Heatmap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg></button>
-<button id="bs" tabindex="-1" aria-label="Session stats" title="Session stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 20v-6M12 20V4M18 20V10"/></svg></button>
-<button id="bg" tabindex="-1" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 5h-6M11 5H3M21 12h-9M8 12H3M21 19h-3M14 19H3M15 3v4M9 10v4M18 17v4"/></svg></button>
+<button id="bh" tabindex="-1" aria-label="Heatmap" title="Heatmap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path pathLength="1" d="M3 9h18"/><path pathLength="1" d="M3 15h18"/><path pathLength="1" d="M9 3v18"/><path pathLength="1" d="M15 3v18"/></svg></button>
+<button id="bs" tabindex="-1" aria-label="Session stats" title="Session stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 20v-6"/><path d="M12 20V4"/><path d="M18 20V10"/></svg></button>
+<button id="bg" tabindex="-1" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="t1" pathLength="18" d="M3 5H21"/><path class="t2" pathLength="18" d="M3 12H21"/><path class="t3" pathLength="18" d="M3 19H21"/><path class="k1" d="M15 3v4"/><path class="k2" d="M9 10v4"/><path class="k3" d="M18 17v4"/></svg></button>
 </div>
 <div id="main">
 <div id="pace"><i></i></div>
@@ -1010,6 +1185,7 @@ html[data-bg=meadow] #idlefx i,html[data-bg=light] #idlefx i{display:block;backg
 
 <div class="sec">Data Management</div>
 <div class="grp">
+<div class="it"><span class="lb"><span>Word grid<span class="mut" style="display:block;margin-top:.15rem">Every pair as an editable spreadsheet</span></span></span><button id="bgrid" type="button">Open grid</button></div>
 <div class="pad"><div class="lb"><b>Backup &amp; import</b></div>
 <div class="fn" style="margin-left:0">Export fills the box with JSON or a pair,word CSV. Paste JSON, CSV or a Speffz grid and press Import, or choose a file.</div>
 <label><input type="file" id="bfile" accept=".csv,.tsv,.txt,.json,text/csv" style="display:none"><span class="btnlike">Choose CSV or JSON file</span></label>
@@ -1161,15 +1337,21 @@ C,cat,cabin,cucumber</pre>
 </div></div>
 
 <div class="ov" id="lookup"><div class="box" role="dialog" aria-label="Word lookup" style="width:min(440px,100%)">
-<h2>Word lookup <button data-close>Close</button></h2>
+<h2>Word lookup <span class="row" style="margin:0;flex-wrap:nowrap"><button id="lgrid" type="button">Grid view</button><button data-close>Close</button></span></h2>
 <input id="lq" class="fld" maxlength="2" placeholder="BX" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Letter pair">
 <input id="lw" class="fld" type="text" placeholder="mnemonic word" autocomplete="off" spellcheck="false" aria-label="Mnemonic word">
 <div class="mut" id="ls"></div>
 <div class="row" style="margin-top:.8rem"><button id="lsave">Save word</button><button id="ldel">Remove word</button></div>
 </div></div>
+<div class="ov" id="grid"><div class="box" role="dialog" aria-label="Word grid">
+<h2>Word grid <button data-close>Close</button></h2>
+<div class="gtop"><div class="mut" id="ghint">First letter down the side, second letter across the top. Click a cell to edit, Enter to save, or paste a block from Sheets or Excel. Click a letter on the top or side to select it, then drill that row or column.</div>
+<div class="row" style="margin:0"><button id="gdrill" type="button" class="primary" style="display:none"></button><span class="gcount" id="gcount"></span><button id="gzo" type="button" aria-label="Smaller cells">&minus;</button><button id="gzi" type="button" aria-label="Larger cells">+</button></div></div>
+<div class="gscroll" id="gsc"><table id="gt"></table></div>
+</div></div>
 
 <div class="ov" id="drawer"><div class="box" role="dialog" aria-label="Session stats">
-<h2>Session <button data-close>Close</button></h2>
+<h2>Stats <button data-close>Close</button></h2>
 <div id="sb"></div>
 </div></div>
 
@@ -1309,17 +1491,17 @@ function start(){
   cur=c;prev=c[c.length-1];
   P.className='run space-enter';P.style.setProperty('--n',c.length);
   {const r=(a,b)=>(a+Math.random()*(b-a)).toFixed(2);P.style.setProperty('--ex',r(-12,12)+'px');P.style.setProperty('--ey',r(2,7)+'px');P.style.setProperty('--er',r(-1.4,1.4)+'deg');P.style.setProperty('--es',r(.975,.995))}
-  P.innerHTML=c.map(k=>'<span>'+k+'</span>').join('');P.style.setProperty('--gap',set().gap+'rem');P.addEventListener('animationend',()=>P.classList.remove('space-enter'),{once:true});
+  P.innerHTML=c.map((k,i)=>'<span style="--i:'+i+'">'+k+'</span>').join('');P.style.setProperty('--gap',set().gap+'rem');P.addEventListener('animationend',e=>{if(e.target===P)P.classList.remove('space-enter')});
   
-  T.textContent='';T.className='';W.textContent='';
+  T.textContent='';T.className='';W.textContent='';W.classList.remove('pop');
   PB.style.visibility=set().pace?'visible':'hidden';PBI.style.transform='scaleX(0)';PB.classList.remove('over');
   document.body.classList.add('live','solving');
   st=1;t0=performance.now();clearTimeout(ft);snd('start');
-  if(set().flash)ft=setTimeout(()=>{if(st===1)P.classList.add('hid')},set().fd*1000);
+  if(set().flash)ft=setTimeout(()=>{if(st===1)P.classList.add('hid')},Math.max(0,set().fd*1000-60));
   raf=requestAnimationFrame(tick);
 }
 function stop(){
-  document.body.classList.remove('solving');el=performance.now()-t0;st=2;postStop=true;snd('stop');cancelAnimationFrame(raf);clearTimeout(ft);
+  document.body.classList.remove('solving');el=performance.now()-t0;st=2;postStop=true;sndLv=(set().zen||cur.length!==1)?1:rate(el/cur.length);snd('stop');buzz(sndLv===2?[14]:[8]);cancelAnimationFrame(raf);clearTimeout(ft);
   P.classList.remove('hid','pulse','run');
   const per=el/cur.length,single=cur.length===1,levelNow=rate(per);
   cur.forEach(k=>{
@@ -1336,7 +1518,7 @@ function stop(){
   if(drill&&single&&drill.list.some(x=>x.k===cur[0])){(drill.times[cur[0]]||(drill.times[cur[0]]=[])).push(per);drill.n++}
   D.hist.push({p:cur.join(' '),t:Math.round(el),d:Date.now()});if(D.hist.length>HIST_CAP)D.hist.splice(0,D.hist.length-HIST_CAP);
   save();
-  if(!set().zen){T.textContent=fmt(el);T.className=single?'r'+rate(per):'done';if(single)washFx(rate(per))}else T.textContent='';
+  if(!set().zen){T.textContent=fmt(el);T.className=single?'r'+rate(per):'done';if(single){washFx(rate(per));pairFx(RC[rate(per)])}else pairFx('var(--acc)')}else T.textContent='';
   PB.style.visibility='hidden';
   setWord(savedWords());
 }
@@ -1346,17 +1528,24 @@ function fail(){
   document.body.classList.remove('solving');postStop=false;st=2;cancelAnimationFrame(raf);clearTimeout(ft);
   P.classList.remove('hid','pulse','run');
   const now=Date.now();if(cur.length===1)D.fails[cur[0]]=(D.fails[cur[0]]||0)+1;cur.forEach(k=>{D.missed[k]=1;D.missedStreak[k]=0;D.review[k]={last:now,due:now,interval:0}});save();
-  T.textContent='Failed';T.className='failed';washFx(2);
+  T.textContent='Failed';T.className='failed';washFx(2);pairFx(RC[2]);
   PB.style.visibility='hidden';
   setWord(savedWords());
-  snd('fail');
+  snd('fail');buzz([10,45,10]);
   toast(savedWords()?'Word revealed — not logged':'Failed — no saved word for this pair');
 }
 function reset(){
   document.body.classList.remove('solving');cancelAnimationFrame(raf);clearTimeout(ft);st=0;cur=[];postStop=false;hideWI();
   P.className='idle';P.style.removeProperty('--n');P.textContent='Press Spacebar to Start';
-  T.textContent='';T.className='';W.textContent='';PB.style.visibility='hidden';
+  T.textContent='';T.className='';W.textContent='';PB.style.visibility='hidden';idleLast();
 }
+function idleLast(){
+  const h=D.hist&&D.hist[D.hist.length-1];
+  if(!h||set().zen||set().hideT||st!==0)return;
+  T.textContent='last \u00b7 '+h.p+' \u00b7 '+fmt(h.t);T.className='last';
+}
+idleLast();
+function pairFx(c){P.style.setProperty('--rc2',c);P.classList.remove('rs');void P.offsetWidth;P.classList.add('rs')}
 function washFx(l){const w=$('#wash');if(!w)return;w.className='';void w.offsetWidth;w.className='w'+l}
 function press(){if(st===1)stop();else start()}
 function openWI(){
@@ -1388,10 +1577,11 @@ addEventListener('keydown',e=>{
     unsnap(attemptD);D.hist=attemptHist.slice();
     Object.keys(sess).forEach(k=>delete sess[k]);Object.assign(sess,JSON.parse(JSON.stringify(attemptSess)));
     const now=Date.now();if(cur.length===1)D.fails[cur[0]]=(D.fails[cur[0]]||0)+1;cur.forEach(k=>{D.missed[k]=1;D.missedStreak[k]=0;D.review[k]={last:now,due:now,interval:0}});
-    postStop=false;save();T.textContent='Failed';T.className='failed';washFx(2);setWord(savedWords());snd('fail');toast('Time undone — marked as failed');return;
+    postStop=false;save();T.textContent='Failed';T.className='failed';washFx(2);pairFx(RC[2]);setWord(savedWords());snd('fail');toast('Time undone — marked as failed');return;
   }
   if(st===1&&FAIL_KEYS.has(e.key.toLowerCase())){e.preventDefault();fail();return}
   if((e.key==='d'||e.key==='D')&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();openLookup();return}
+  if((e.key==='g'||e.key==='G')&&st!==1&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();openGrid();return}
   if((e.key==='c'||e.key==='C')&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();openChain();return}
   if((e.key==='l'||e.key==='L')&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();openLoc();return}
   if((e.key==='w'||e.key==='W')&&!e.ctrlKey&&!e.metaKey&&!e.altKey){e.preventDefault();openWd();return}
@@ -1719,7 +1909,7 @@ const VOICES={
     case 'tstart':tn(660,t,.09,'sine',.14);tn(990,t+.06,.13,'sine',.12);break;
     case 'tstop':tn(880,t,.5,'sine',.12);tn(1318.5,t+.03,.4,'sine',.06);tn(440,t,.3,'sine',.07);break;
     case 'tsplit':tn(784,t,.1,'sine',.13);tn(1174.7,t+.05,.16,'sine',.1);tn(392,t,.12,'sine',.06);break;
-    case 'stop':tn(392,t,.45,'sine',.22);tn(587.33,t+.02,.4,'sine',.12);tn(196,t,.5,'sine',.1);break;
+    case 'stop':{const m=[1.189,1,.891][sndLv]||1;tn(392*m,t,.45,'sine',.22);tn(587.33*m,t+.02,.4,'sine',.12);tn(196*m,t,.5,'sine',.1);break}
     case 'open':tn(640,t,.05,'triangle',.10,950);tn(1120,t+.035,.06,'sine',.06);break;
     case 'close':tn(860,t,.05,'triangle',.09,520);tn(420,t+.03,.07,'sine',.05);break;
     case 'click':tn(900,t,.025,'triangle',.12,500);break;
@@ -1733,6 +1923,8 @@ const VOICES={
     case 'fail':tn(330,t,.08,'sawtooth',.10,220);tn(155,t+.075,.18,'sine',.16,115);break;
   }},
 };
+let sndLv=1;
+function buzz(p){try{if(set().snd&&navigator.vibrate&&matchMedia('(pointer:coarse)').matches&&!matchMedia('(prefers-reduced-motion:reduce)').matches)navigator.vibrate(p)}catch(e){}}
 function snd(n,dl){
   if(introLock&&n!=='intro')return;
   const s=set();if(!s.snd||!s.vol)return;
@@ -1897,23 +2089,117 @@ function slowest(){
   D.hist.forEach(h=>{if(h.d>=cut&&h.p.indexOf(' ')<0){const o=m[h.p]||(m[h.p]={n:0,s:0});o.n++;o.s+=h.t}});
   return Object.keys(m).map(k=>({k:k,n:m[k].n,a:m[k].s/m[k].n})).sort((x,y)=>y.a-x.a).slice(0,10);
 }
+let stTab='session',stDr={};
+const STH={session:'Session',overall:'Overall',pairs:'Pairs'};
+const stDur=ms=>{const t=Math.round(ms/1000);return t<60?t+'s':Math.floor(t/60)+'m '+String(t%60).padStart(2,'0')+'s'};
+const stN=h=>h.p.split(' ').length;
+const stDay=ms=>{const d=new Date(ms);return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate()};
+const stWord=k=>D.words[k]?esc(String(D.words[k]).toLowerCase()):'-';
+const stSec=ms=>(ms/1000).toFixed(2)+'s';
+function stPool(){const o=[],q=set();for(const a of(q.F||ALL))for(const c of(q.S||ALL)){if(q.noId&&a===c)continue;o.push(a+c)}return o}
+function stTile(l,v,sub,col){return '<div class="tile"><span>'+l+'</span><b'+(col?' style="color:'+col+'"':'')+'>'+v+'</b>'+(sub?'<small>'+sub+'</small>':'')+'</div>'}
+function stBlk(i,t,body){return '<div class="stblk" style="--i:'+i+'">'+(t?'<h3>'+t+'</h3>':'')+body+'</div>'}
+function stBar(parts){
+  const tot=parts.reduce((a,p)=>a+p.n,0)||1;
+  return '<div class="sbar">'+parts.map(p=>p.n?'<i style="width:'+(p.n/tot*100)+'%;background:'+p.col+'" title="'+p.label+': '+p.n+'"></i>':'').join('')+'</div><div class="slg">'+parts.map(p=>'<span><b style="background:'+p.col+'"></b>'+p.n+' '+p.label+'</span>').join('')+'</div>';
+}
+function stSpark(vals,labels){
+  const W=300,H=84,px=8,py=12,tf=set().tf*1000,tm=set().tm*1000,nn=vals.filter(v=>v!=null);
+  if(nn.length<2)return emp('clock','Not enough data yet.');
+  const mx=Math.max(tm*1.35,...nn)*1.04,X=i=>px+i*(W-2*px)/(vals.length-1),Y=v=>H-py-Math.min(v/mx,1)*(H-2*py);
+  let d='',prev=false,dots='';
+  vals.forEach((v,i)=>{if(v==null){prev=false;return}const x=X(i).toFixed(1),y=Y(v).toFixed(1);d+=(prev?'L':'M')+x+' '+y;prev=true;dots+='<circle cx="'+x+'" cy="'+y+'" r="2.5" class="cd'+rate(v)+'"><title>'+(labels?labels[i]+' \u00b7 ':'')+stSec(v)+'</title></circle>'});
+  const th=(v,t)=>'<line x1="0" x2="'+W+'" y1="'+Y(v).toFixed(1)+'" y2="'+Y(v).toFixed(1)+'" class="cth"/><text x="'+(W-2)+'" y="'+(Y(v)-2.5).toFixed(1)+'" text-anchor="end" class="ctx">'+t+'</text>';
+  return '<svg class="spark" viewBox="0 0 '+W+' '+H+'" role="img">'+th(tf,'fast '+set().tf+'s')+th(tm,'slow '+set().tm+'s')+'<path d="'+d+'" class="cl"/>'+dots+'</svg>';
+}
+function stSession(){
+  const n=sess.n,avg=n?sess.sum/n:0;
+  let c=0,t=0;D.hist.forEach(h=>{c+=stN(h);t+=h.t});
+  const all=c?t/c:null,rt=sess.r[0]+sess.r[1]+sess.r[2];
+  let sub=null;if(n&&all!=null){const d=avg-all;sub='<span style="color:'+(d<=0?'var(--g)':'var(--r)')+'">'+(d<=0?'\u2212':'+')+(Math.abs(d)/1000).toFixed(2)+'s</span> vs all-time'}
+  let h=stBlk(0,'',
+    '<div class="tiles">'+stTile('Pairs',n)+stTile('Average',n?fmt(avg):'\u2013',sub,n?RC[rate(avg)]:null)+stTile('Best',sess.best!==null?fmt(sess.best):'\u2013',null,sess.best!==null?RC[rate(sess.best)]:null)+stTile('Fast rate',rt?Math.round(sess.r[0]/rt*100)+'%':'\u2013',n?stDur(sess.sum)+' solving':null)+'</div>');
+  if(!n)return h+stBlk(1,'',emp('clock','No attempts yet. Press Space to start.'));
+  if(rt)h+=stBlk(1,'Ratings this session',stBar([{n:sess.r[0],col:'var(--g)',label:'fast'},{n:sess.r[1],col:'var(--y)',label:'medium'},{n:sess.r[2],col:'var(--r)',label:'slow'}]));
+  const rec=sess.rec.slice().reverse();
+  h+=stBlk(2,'Times, oldest to newest',stSpark(rec.map(r=>r.t/stN(r)),rec.map(r=>r.p)));
+  h+=stBlk(3,'Recent',sess.rec.slice(0,20).map(r=>{const m=r.p.indexOf(' ')<0;return '<div class="stat"><span>'+r.p+(m&&D.words[r.p]?' <span class="mut">\u00b7 '+stWord(r.p)+'</span>':'')+'</span><span style="color:'+(m?RC[rate(r.t)]:'var(--acc)')+'">'+fmt(r.t)+'</span></div>'}).join(''));
+  return h;
+}
+function stOverall(){
+  const H=D.hist;
+  if(!H.length)return stBlk(0,'',emp('clock','Nothing logged yet. Your history builds up as you practise.'));
+  let pairs=0,tot=0,best=null,bestK='';const per=[];
+  H.forEach(h=>{const m=stN(h),p=h.t/m;pairs+=m;tot+=h.t;per.push(p);if(best===null||p<best){best=p;bestK=h.p}});
+  const dset=new Set(H.map(h=>stDay(h.d)));
+  const td=new Date();td.setHours(0,0,0,0);
+  let streak=0;const sd=new Date(td);if(!dset.has(stDay(sd.getTime())))sd.setDate(sd.getDate()-1);
+  while(dset.has(stDay(sd.getTime()))){streak++;sd.setDate(sd.getDate()-1)}
+  const days=[],dm={};
+  for(let i=13;i>=0;i--){const d=new Date(td);d.setDate(d.getDate()-i);const o={n:0,s:0,lab:'SMTWTFS'[d.getDay()],full:d.toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short'})};days.push(o);dm[stDay(d.getTime())]=o}
+  H.forEach(h=>{const o=dm[stDay(h.d)];if(o){o.n+=stN(h);o.s+=h.t}});
+  const todayN=days[13].n,mxN=Math.max(1,...days.map(d=>d.n));
+  let o=stBlk(0,'','<div class="tiles">'+stTile('Today',todayN,'pairs')+stTile('Streak',streak,streak===1?'day':'days')+stTile('Days practised',dset.size)+stTile('Pairs logged',pairs.toLocaleString())+stTile('All-time average',stSec(tot/pairs),null,RC[rate(tot/pairs)])+stTile('Best',stSec(best),bestK,RC[rate(best)])+'</div>');
+  const w=Math.min(100,Math.floor(per.length/2));
+  if(w>=10){
+    const a1=per.slice(-w).reduce((x,y)=>x+y,0)/w,a0=per.slice(-2*w,-w).reduce((x,y)=>x+y,0)/w,d=a1-a0;
+    o+=stBlk(1,'Trend',
+      '<div class="trend"><div><span>Previous '+w+'</span><b>'+stSec(a0)+'</b></div><div class="arr" style="color:'+(d<=0?'var(--g)':'var(--r)')+'">'+(d<=0?'\u2193':'\u2191')+' '+(Math.abs(d)/1000).toFixed(2)+'s</div><div><span>Latest '+w+'</span><b style="color:'+RC[rate(a1)]+'">'+stSec(a1)+'</b></div></div>');
+  }
+  o+=stBlk(2,'Pairs per day, last 14 days','<div class="dcols">'+days.map((d,i)=>'<div class="dcol'+(i===13?' now':'')+'" title="'+d.full+': '+d.n+' pairs'+(d.n?', avg '+stSec(d.s/d.n):'')+'"><em>'+(d.n||'')+'</em><div class="dtrack"><div class="dbar" style="height:'+(d.n/mxN*100)+'%;--d:'+i+'"></div></div><i>'+d.lab+'</i></div>').join('')+'</div>');
+  o+=stBlk(3,'Daily average',stSpark(days.map(d=>d.n?d.s/d.n:null),days.map(d=>d.full)));
+  const edges=[.6,.8,1,1.3,1.7,2.2,3,4],rep=[.45,.7,.9,1.15,1.5,1.95,2.6,3.5,4.5],lab=['<.6','.6','.8','1','1.3','1.7','2.2','3','4+'],bk=new Array(9).fill(0);
+  per.forEach(p=>{const s=p/1000;let i=0;while(i<edges.length&&s>=edges[i])i++;bk[i]++});
+  const mb=Math.max(1,...bk);
+  o+=stBlk(4,'How your times are spread (seconds per pair)','<div class="hist">'+bk.map((c,i)=>'<div class="hcol" title="'+c+' attempts"><em>'+(c||'')+'</em><div class="dtrack"><div class="dbar r'+rate(rep[i]*1000)+'" style="height:'+(c/mb*100)+'%;--d:'+i+'"></div></div><i>'+lab[i]+'</i></div>').join('')+'</div>');
+  const pool=stPool(),seen=pool.filter(k=>D.stats[k]&&D.stats[k].n),cnt=[0,0,0];seen.forEach(k=>cnt[rate(avgT(k))]++);
+  const withW=pool.filter(k=>D.words[k]).length;
+  o+=stBlk(5,'Coverage of your pairs ('+pool.length+')',stBar([{n:cnt[0],col:'var(--g)',label:'fast'},{n:cnt[1],col:'var(--y)',label:'medium'},{n:cnt[2],col:'var(--r)',label:'slow'},{n:pool.length-seen.length,col:'var(--line)',label:'not seen'}])+'<div class="mut" style="margin-top:.55rem">'+withW+' of '+pool.length+' have a word saved</div>');
+  const colOf=(kind)=>L.map(l=>{
+    const ks=seen.filter(k=>kind==='first'?k[0]===l:k[1]===l);
+    return{l:l,n:ks.length,a:ks.length?ks.reduce((x,k)=>x+avgT(k),0)/ks.length:null};
+  });
+  const f1=colOf('first'),f2=colOf('second'),mxA=Math.max(1,...f1.concat(f2).map(x=>x.a||0));
+  const lt=(arr,kind)=>'<div class="lcols">'+arr.map((x,i)=>'<div class="lcol"'+(x.a!=null?' data-dl="'+kind+':'+x.l+'"':'')+' title="'+(kind==='first'?x.l+'_':'_'+x.l)+(x.a!=null?' \u00b7 avg '+stSec(x.a)+' \u00b7 '+x.n+' pairs \u00b7 click to drill':' \u00b7 no data')+'"><div class="dtrack"><div class="dbar r'+(x.a!=null?rate(x.a):'n')+'" style="height:'+(x.a!=null?Math.max(6,x.a/mxA*100):0)+'%;--d:'+(i%12)+'"></div></div><i>'+x.l+'</i></div>').join('')+'</div>';
+  o+=stBlk(6,'Average by first letter','<div class="mut" style="margin-bottom:.4rem">Click a bar to drill that row.</div>'+lt(f1,'first'));
+  o+=stBlk(7,'Average by second letter','<div class="mut" style="margin-bottom:.4rem">Click a bar to drill that column.</div>'+lt(f2,'second'));
+  return o;
+}
+function stPairs(){
+  const now=Date.now();
+  const sl=slowest();stDr.slow48=sl;
+  const known=Object.keys(D.stats).filter(k=>D.stats[k]&&D.stats[k].n>=3).map(k=>({k:k,a:avgT(k),n:D.stats[k].n}));
+  const slowAll=known.slice().sort((x,y)=>y.a-x.a).slice(0,10),fastAll=known.slice().sort((x,y)=>x.a-y.a).slice(0,10);
+  stDr.slowAll=slowAll;
+  const failed=Object.keys(D.fails).filter(k=>D.fails[k]).map(k=>({k:k,c:D.fails[k]})).sort((x,y)=>y.c-x.c).slice(0,10);
+  const due=Object.keys(D.review).filter(k=>/^[A-X]{2}$/.test(k)&&D.review[k]&&D.review[k].due<=now).sort((x,y)=>D.review[x].due-D.review[y].due);
+  stDr.due=due.slice(0,40).map(k=>({k:k,a:D.stats[k]?avgT(k):null}));
+  const wk=Object.keys(D.flag),missed=Object.keys(D.missed);
+  const hd='<div class="lr hd"><span>#</span><span>Pair</span><span>Word</span><span>Avg</span></div>';
+  const rows=(a,f)=>a.map((r,i)=>'<div class="lr"><span class="rk">'+(i+1)+'</span><span class="lp">'+r.k+'</span><span class="lwd">'+stWord(r.k)+'</span><span class="lt" style="color:'+(f?f(r)[1]:RC[rate(r.a)])+'">'+(f?f(r)[0]:fmt(r.a))+'</span></div>').join('');
+  const chips=a=>'<div class="pchips">'+a.map(x=>'<span class="pchip">'+x+'</span>').join('')+'</div>';
+  let o=stBlk(0,'','<div class="tiles">'+stTile('Weak pairs',wk.length)+stTile('Missed words',missed.length)+stTile('Due for review',due.length)+'</div>');
+  o+=stBlk(1,'Slowest, last 48 hours',sl.length?'<button class="primary drillbtn" type="button" data-drill="slow48">Drill these '+sl.length+'</button>'+hd+rows(sl):emp('clock','No single-pair attempts in the last 48 hours.'));
+  o+=stBlk(2,'Slowest of all time',slowAll.length?'<button class="primary drillbtn" type="button" data-drill="slowAll" data-lbl="slowest pairs, all time">Drill these '+slowAll.length+'</button>'+hd+rows(slowAll)+'<div class="mut" style="margin-top:.4rem">Pairs with at least 3 attempts.</div>':emp('clock','Needs a few attempts per pair first.'));
+  o+=stBlk(3,'Fastest of all time',fastAll.length?hd+rows(fastAll):emp('clock','Needs a few attempts per pair first.'));
+  o+=stBlk(4,'Most failed',failed.length?'<div class="lr hd"><span>#</span><span>Pair</span><span>Word</span><span>Fails</span></div>'+rows(failed,r=>[r.c,'var(--r)']):emp('check','No failed pairs recorded.'));
+  o+=stBlk(5,'Weak pairs',wk.length?chips(wk.sort().map(k=>k+(D.streak[k]?' <small>'+D.streak[k]+'/3</small>':''))):emp('check','No weak pairs flagged. Nice.'));
+  o+=stBlk(6,'Missed-word pairs',missed.length?chips(missed.sort()):emp('check','Nothing waiting for review.'));
+  o+=stBlk(7,'Due for review',due.length?'<button class="primary drillbtn" type="button" data-drill="due" data-lbl="pairs due for review">Drill the '+stDr.due.length+' most overdue</button>'+chips(due.slice(0,24))+(due.length>24?'<div class="mut" style="margin-top:.4rem">and '+(due.length-24)+' more</div>':''):emp('check','Nothing due right now.'));
+  return o;
+}
 function renderStats(){
   const b=$('#sb');
   if(set().zen){b.innerHTML='<div class="mut">Zen mode is on. Turn it off in settings to see stats.</div>';return}
-  const avg=sess.n?sess.sum/sess.n:0,wk=Object.keys(D.flag),missed=Object.keys(D.missed),wd=Object.keys(D.words),sl=slowest();
-  let h='<div class="stat"><span>Pairs completed</span><span>'+sess.n+'</span></div>'+
-  '<div class="stat"><span>Average per pair</span><span>'+(sess.n?fmt(avg):'-')+'</span></div>'+
-  '<div class="stat"><span>Best per pair</span><span>'+(sess.best!==null?fmt(sess.best):'-')+'</span></div>'+
-  '<div class="stat"><span>Fast / medium / slow</span><span><span style="color:#4ADE80">'+sess.r[0]+'</span> / <span style="color:#FBBF24">'+sess.r[1]+'</span> / <span style="color:#F87171">'+sess.r[2]+'</span></span></div>'+
-  '<div class="stat"><span>Weak pairs flagged</span><span>'+wk.length+'</span></div>'+
-  '<div class="stat"><span>Missed-word pairs</span><span>'+missed.length+'</span></div>'+
-  '<h3>Slowest pairs, last 48 hours</h3>'+(sl.length?'<button class="primary drillbtn" id="drillBtn" type="button">Drill these '+sl.length+'</button>':'')+(sl.length?'<div class="lr hd"><span>#</span><span>Pair</span><span>Word</span><span>Avg</span></div>'+sl.map((r,i)=>'<div class="lr"><span class="rk">'+(i+1)+'</span><span class="lp">'+r.k+'</span><span class="lwd">'+(D.words[r.k]?esc(String(D.words[r.k]).toLowerCase()):'-')+'</span><span class="lt" style="color:'+RC[rate(r.a)]+'">'+fmt(r.a)+'</span></div>').join(''):emp('clock','No single-pair attempts in the last 48 hours.'))+
-  '<h3>Recent</h3>'+(sess.rec.length?sess.rec.slice(0,20).map(r=>'<div class="stat"><span>'+r.p+'</span><span style="color:'+(r.p.indexOf(' ')>-1?'var(--acc)':RC[rate(r.t)])+'">'+fmt(r.t)+'</span></div>').join(''):emp('clock','No attempts yet. Press Space to start.'))+
-  '<h3>Weak pairs</h3>'+(wk.length?'<div class="mut">'+wk.sort().map(k=>k+(D.streak[k]?' ('+D.streak[k]+'/3)':'')).join('  ')+'</div>':emp('check','No weak pairs flagged. Nice.'))+
-  '<h3>Memo words ('+wd.length+')</h3>'+(wd.length?'<div class="mut">'+wd.sort().map(k=>k+' '+esc(String(D.words[k]).toLowerCase())).join('<br>')+'</div>':emp('book','No words saved yet. Press Tab after a stop, or use the lookup.'));
-  b.innerHTML=h;
-  const db=$('#drillBtn');if(db)db.onclick=()=>startDrill(sl);
+  stDr={};
+  const tabs='<div class="seg">'+Object.keys(STH).map(k=>'<button type="button" data-st="'+k+'"'+(k===stTab?' class="on"':'')+'>'+STH[k]+'</button>').join('')+'</div>';
+  b.innerHTML=tabs+(stTab==='overall'?stOverall():stTab==='pairs'?stPairs():stSession());
 }
+$('#sb').addEventListener('click',e=>{
+  const t=e.target.closest('[data-st]');if(t){stTab=t.dataset.st;renderStats();$('#drawer .box').scrollTop=0;return}
+  const d=e.target.closest('[data-drill]');if(d&&stDr[d.dataset.drill]){startDrill(stDr[d.dataset.drill],d.dataset.lbl);return}
+  const l=e.target.closest('[data-dl]');if(l){const q=l.dataset.dl.split(':');drillLetter(q[0],q[1])}
+});
 
 /* drill the slowest pairs */
 let drill=null;
@@ -2701,6 +2987,123 @@ function openLookup(){
 }
 $('#bd').onclick=openLookup;
 
+/* word grid: every pair as an editable spreadsheet, always in sync with D.words (the same store the lookup uses) */
+const GT=$('#gt'),GSC=$('#gsc');
+let gBuilt=false,gCells=[],gRH={},gCH={},gZ=1,gHl=null;
+const GZS=[{w:4.8,h:1.75,f:.7},{w:6.4,h:2.05,f:.78},{w:8.2,h:2.4,f:.9}];
+let gCur=Object.assign({},GZS[1]),gAnim=0;
+function gBuild(){
+  let h='<thead><tr><th class="gcorner"></th>'+L.map(l=>'<th data-c="'+l+'">'+l+'</th>').join('')+'</tr></thead><tbody>';
+  for(const a of L){
+    h+='<tr><th data-r="'+a+'">'+a+'</th>';
+    for(const b of L)h+='<td'+(a===b?' class="dg"':'')+'><input data-p="'+a+b+'" maxlength="40" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Word for '+a+b+'"></td>';
+    h+='</tr>';
+  }
+  GT.innerHTML=h+'</tbody>';
+  gCells=[...GT.querySelectorAll('input')];
+  GT.querySelectorAll('th[data-r]').forEach(t=>gRH[t.dataset.r]=t);
+  GT.querySelectorAll('th[data-c]').forEach(t=>gCH[t.dataset.c]=t);
+  GT.querySelectorAll('th[data-r]').forEach(t=>t.title='Select row '+t.dataset.r+'_ to drill');
+  GT.querySelectorAll('th[data-c]').forEach(t=>t.title='Select column _'+t.dataset.c+' to drill');
+  gBuilt=true;
+}
+function gCount(){$('#gcount').textContent=Object.keys(D.words).filter(k=>/^[A-X]{2}$/.test(k)&&D.words[k]).length+' / 576 filled'}
+function gRefresh(){gCells.forEach(i=>{const w=D.words[i.dataset.p]||'';if(document.activeElement!==i)i.value=w;i.parentNode.classList.toggle('f',!!w)});gCount()}
+function gApply(c){GT.style.setProperty('--cw',c.w+'rem');GT.style.setProperty('--ch',c.h+'rem');GT.style.setProperty('--cf',c.f+'rem')}
+function gZoom(d){
+  gZ=Math.max(0,Math.min(GZS.length-1,gZ+d));
+  $('#gzo').disabled=gZ===0;$('#gzi').disabled=gZ===GZS.length-1;
+  const to=GZS[gZ];cancelAnimationFrame(gAnim);
+  if(!d||!gBuilt||!GSC.clientWidth||matchMedia('(prefers-reduced-motion:reduce)').matches){gCur=Object.assign({},to);gApply(gCur);return}
+  const from=Object.assign({},gCur),t0=performance.now();
+  const fx=GSC.scrollWidth?(GSC.scrollLeft+GSC.clientWidth/2)/GSC.scrollWidth:0,fy=GSC.scrollHeight?(GSC.scrollTop+GSC.clientHeight/2)/GSC.scrollHeight:0;
+  const step=now=>{
+    const p=Math.min(1,(now-t0)/320),e=1-Math.pow(1-p,3);
+    gCur={w:from.w+(to.w-from.w)*e,h:from.h+(to.h-from.h)*e,f:from.f+(to.f-from.f)*e};gApply(gCur);
+    GSC.scrollLeft=fx*GSC.scrollWidth-GSC.clientWidth/2;GSC.scrollTop=fy*GSC.scrollHeight-GSC.clientHeight/2;
+    if(p<1)gAnim=requestAnimationFrame(step);
+  };
+  gAnim=requestAnimationFrame(step);
+}
+/* write one cell into the store (no save); returns true if it changed */
+function gSet(i,val){
+  const k=i.dataset.p,old=D.words[k]||'',v=String(val).trim().toLowerCase();
+  if(v===old.toLowerCase()){i.value=old;return false}
+  if(v)D.words[k]=v;else delete D.words[k];
+  i.value=v;i.parentNode.classList.toggle('f',!!v);return true;
+}
+function gCommit(i){if(gSet(i,i.value)){save();snd('dictionary');gCount()}}
+function gAt(r,c){return r<0||c<0||r>=24||c>=24?null:gCells[r*24+c]}
+function gPos(i){return[L.indexOf(i.dataset.p[0]),L.indexOf(i.dataset.p[1])]}
+function gReveal(td){
+  const hh=GT.tHead.offsetHeight,hw=GT.rows[0].cells[0].offsetWidth,l=td.offsetLeft,t=td.offsetTop,w=td.offsetWidth,h=td.offsetHeight;
+  if(l<GSC.scrollLeft+hw)GSC.scrollLeft=l-hw;else if(l+w>GSC.scrollLeft+GSC.clientWidth)GSC.scrollLeft=l+w-GSC.clientWidth;
+  if(t<GSC.scrollTop+hh)GSC.scrollTop=t-hh;else if(t+h>GSC.scrollTop+GSC.clientHeight)GSC.scrollTop=t+h-GSC.clientHeight;
+}
+function gGo(i,dr,dc){const[r,c]=gPos(i),n=gAt(r+dr,c+dc);if(n){n.focus({preventScroll:true});n.select();gReveal(n.parentNode)}}
+GT.addEventListener('focusin',e=>{
+  const i=e.target;if(!i.dataset||!i.dataset.p)return;
+  const[r,c]=gPos(i);gUnhl();gHl=[gRH[L[r]],gCH[L[c]]];gHl.forEach(t=>t.classList.add('hl'));gReveal(i.parentNode);
+});
+function gUnhl(){if(gHl)gHl.forEach(t=>t.classList.remove('hl'));gHl=null}
+GT.addEventListener('focusout',e=>{const i=e.target;if(i.dataset&&i.dataset.p){gCommit(i)}gUnhl()});
+GT.addEventListener('keydown',e=>{
+  const i=e.target;if(!i.dataset||!i.dataset.p)return;
+  const k=e.key;
+  if(k==='Enter'){e.preventDefault();gCommit(i);gGo(i,e.shiftKey?-1:1,0)}
+  else if(k==='ArrowDown'){e.preventDefault();gGo(i,1,0)}
+  else if(k==='ArrowUp'){e.preventDefault();gGo(i,-1,0)}
+  else if(k==='ArrowRight'&&i.selectionStart===i.value.length&&i.selectionEnd===i.value.length){e.preventDefault();gGo(i,0,1)}
+  else if(k==='ArrowLeft'&&i.selectionStart===0&&i.selectionEnd===0){e.preventDefault();gGo(i,0,-1)}
+  else if(k==='Escape'){
+    const old=D.words[i.dataset.p]||'';
+    if(i.value.trim().toLowerCase()!==old.toLowerCase()){e.preventDefault();e.stopPropagation();i.value=old;i.select()}
+  }
+});
+GT.addEventListener('paste',e=>{
+  const i=e.target;if(!i.dataset||!i.dataset.p)return;
+  const t=(e.clipboardData||window.clipboardData).getData('text');
+  if(!/[\t\n]/.test(t.replace(/\r?\n$/,'')))return;
+  e.preventDefault();
+  const rows=t.replace(/\r/g,'').replace(/\n$/,'').split('\n').map(r=>r.split('\t'));
+  const[r0,c0]=gPos(i);let ch=0;
+  rows.forEach((row,dr)=>row.forEach((v,dc)=>{const n=gAt(r0+dr,c0+dc);if(n&&gSet(n,v.replace(/^"|"$/g,'')))ch++}));
+  if(ch){save();snd('dictionary');gCount();toast('Pasted '+ch+' cell'+(ch===1?'':'s'))}
+});
+function openGrid(k){
+  if(!gBuilt){gBuild();gZoom(0)}
+  gRefresh();gSelect(null);
+  openM('grid');
+  const ok=k&&/^[A-X]{2}$/.test(k);
+  setTimeout(()=>{
+    if(ok){
+      const i=gAt(L.indexOf(k[0]),L.indexOf(k[1])),td=i.parentNode;
+      GSC.scrollLeft=td.offsetLeft-GSC.clientWidth/2+td.offsetWidth/2;GSC.scrollTop=td.offsetTop-GSC.clientHeight/2+td.offsetHeight/2;
+      td.classList.remove('gf');void td.offsetWidth;td.classList.add('gf');
+    }else{GSC.scrollLeft=0;GSC.scrollTop=0}
+  },60);
+}
+let gSel=null;
+function gSelect(sel){
+  if(gSel)(gSel[0]==='first'?gRH:gCH)[gSel[1]].classList.remove('sel');
+  gCells.forEach(i=>i.parentNode.classList.remove('gs'));
+  gSel=sel;const b=$('#gdrill');
+  if(sel){
+    (sel[0]==='first'?gRH:gCH)[sel[1]].classList.add('sel');
+    gCells.forEach(i=>{const q=i.dataset.p;if(sel[0]==='first'?q[0]===sel[1]:q[1]===sel[1])i.parentNode.classList.add('gs')});
+    b.textContent='Drill '+(sel[0]==='first'?sel[1]+'_':'_'+sel[1])+' pairs';b.style.display='';
+  }else b.style.display='none';
+}
+GT.addEventListener('click',e=>{
+  const t=e.target.closest('th');if(!t||!t.dataset)return;
+  const sel=t.dataset.r?['first',t.dataset.r]:t.dataset.c?['second',t.dataset.c]:null;if(!sel)return;
+  snd('select');gSelect(gSel&&gSel[0]===sel[0]&&gSel[1]===sel[1]?null:sel);
+});
+$('#gdrill').onclick=()=>{if(gSel)drillLetter(gSel[0],gSel[1])};
+$('#gzo').onclick=()=>gZoom(-1);$('#gzi').onclick=()=>gZoom(1);
+$('#bgrid').onclick=()=>openGrid();
+$('#lgrid').onclick=()=>openGrid(lq.value.length===2?lq.value:'');
+
 /* tooltips */
 const TIP=$('#tip');
 function showTip(el){
@@ -2718,7 +3121,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')hideTip()},true);
 
 /* idle hints: the start prompt rotates through shortcuts */
 (function(){
-  const H=['Press Spacebar to Start','Press T to open the timer','Press D to look up a word','Press C to start a memo chain','Press L for the sticker trainer','Press W for the word trainer','Press Tab after a stop to save your word','Press \\ to undo your last time'];
+  const H=['Press Spacebar to Start','Press T to open the timer','Press D to look up a word','Press G for the word grid','Press C to start a memo chain','Press L for the sticker trainer','Press W for the word trainer','Press Tab after a stop to save your word','Press \\ to undo your last time'];
   let i=0;
   const ok=()=>st===0&&!modal&&P.classList.contains('idle');
   setInterval(()=>{
